@@ -89,7 +89,7 @@ export default function ContactPage() {
           <h2 className="text-xl font-bold mb-4 text-gold-dark">{STORE_INFO.slogan}</h2>
           <p className="text-muted leading-relaxed mb-6">
             نحن في Chi7a Store نقدم لكم أفضل المنتجات من الآيفون والأندرويد
-            والأجهزة اللوحية والإكسسوارات بأفضل الأسعار في منطقة دوز وجنوب تونس.
+            والأجهزة اللوحية والإكسسوارات بأفضل الأسعار في قبلي، دوز وجنوب تونس.
           </p>
           <div className="flex items-center gap-2 text-sm text-muted">
             <Clock size={16} />

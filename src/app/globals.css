@@ -97,7 +97,23 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .animate-scale-in,
-  .stagger > * {
+  .stagger > *,
+  .banner-slide,
+  .banner-progress {
     animation: none;
+    transition: none;
   }
+}
+
+@keyframes banner-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.banner-progress {
+  animation: banner-progress 6s linear forwards;
+}
+
+.banner-progress-paused {
+  animation-play-state: paused;
 }

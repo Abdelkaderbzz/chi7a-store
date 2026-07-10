@@ -1,10 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Phone, Globe, MapPin } from "lucide-react";
 import { STORE_INFO } from "@/lib/constants";
 import { SearchBar } from "@/components/store/SearchBar";
 import { CategoryMenu } from "@/components/store/CategoryMenu";
 import { CartButton } from "@/components/store/CartButton";
+import { StoreLogo } from "@/components/store/StoreLogo";
 
 interface Category {
   slug: string;
@@ -24,10 +24,10 @@ export function Header({ categories }: { categories: Category[] }) {
       {/* Top bar — inspired by reference */}
       <div className="bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <Image src="/logo.png" alt="Chi7a Store" width={44} height={44} className="rounded-full" />
+          <Link href="/" className="flex items-center gap-3 shrink-0">
+            <StoreLogo size={52} />
             <div className="hidden sm:block">
-              <span className="font-bold text-base leading-tight block">Chi7a Store</span>
+              <span className="font-bold text-base leading-tight block text-white">Chi7a Store</span>
               <span className="text-[10px] text-gold-light">{STORE_INFO.slogan}</span>
             </div>
           </Link>
@@ -78,7 +78,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <Image src="/logo.png" alt="Chi7a Store" width={48} height={48} className="rounded-full" />
+            <StoreLogo size={56} />
             <div>
               <h3 className="font-bold text-white text-lg">Chi7a Store</h3>
               <p className="text-sm text-gold-light">{STORE_INFO.slogan}</p>

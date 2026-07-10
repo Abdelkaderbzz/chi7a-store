@@ -15,6 +15,11 @@ export const metadata: Metadata = {
     template: `%s | ${STORE_INFO.name}`,
   },
   description: STORE_INFO.welcome,
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    apple: [{ url: "/logo.png", type: "image/png" }],
+    shortcut: ["/logo.png"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

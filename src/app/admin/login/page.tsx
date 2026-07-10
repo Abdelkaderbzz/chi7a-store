@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { loginAction } from "@/lib/actions";
-import Image from "next/image";
+import { StoreLogo } from "@/components/store/StoreLogo";
 
 export default function AdminLoginPage() {
   const [state, formAction, pending] = useActionState(
@@ -16,7 +16,9 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Image src="/logo.png" alt="Chi7a Store" width={80} height={80} className="rounded-full mx-auto mb-4" />
+          <div className="flex justify-center mb-4">
+            <StoreLogo size={80} />
+          </div>
           <h1 className="text-2xl font-bold text-gold-dark">Chi7a Store</h1>
           <p className="text-gray-500 text-sm mt-1">لوحة الإدارة</p>
         </div>

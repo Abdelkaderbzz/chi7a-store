@@ -90,7 +90,7 @@ export default function CheckoutPage() {
               <FormSelect
                 name="city"
                 required
-                defaultValue="دوز"
+                defaultValue="قبلي"
                 placeholder="اختر المدينة"
                 options={TUNISIAN_CITIES.map((c) => ({ value: c, label: c }))}
               />
