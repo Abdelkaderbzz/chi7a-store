@@ -85,42 +85,55 @@ export async function placeOrderAction(input: CheckoutInput) {
 }
 
 export async function updateOrderStatusAction(orderId: string, status: string) {
-  await requireAdmin();
-  if (!VALID_STATUSES.has(status as never)) return;
+  try {
+    await requireAdmin();
+    if (!VALID_STATUSES.has(status as never)) return { error: "حالة غير صالحة" };
 
-  await db.order.update({ where: { id: orderId }, data: { status } });
-  revalidatePath("/admin/orders");
-  revalidatePath(`/admin/orders/${orderId}`);
-  revalidatePath(`/admin/orders/${orderId}/edit`);
+    await db.order.update({ where: { id: orderId }, data: { status } });
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${orderId}`);
+    revalidatePath(`/admin/orders/${orderId}/edit`);
+    return { success: true, message: "تم تحديث حالة الطلب بنجاح" };
+  } catch (error) {
+    return { error: "حدث خطأ أثناء تحديث الحالة" };
+  }
 }
 
 export async function updateOrderAction(formData: FormData) {
-  await requireAdmin();
+  try {
+    await requireAdmin();
 
-  const orderId = formData.get("orderId") as string;
-  const customerName = (formData.get("customerName") as string)?.trim();
-  const phone = (formData.get("phone") as string)?.trim();
-  const city = (formData.get("city") as string)?.trim();
-  const address = (formData.get("address") as string)?.trim();
-  const status = formData.get("status") as string;
-  const note = (formData.get("note") as string)?.trim() || null;
+    const orderId = formData.get("orderId") as string;
+    const customerName = (formData.get("customerName") as string)?.trim();
+    const phone = (formData.get("phone") as string)?.trim();
+    const city = (formData.get("city") as string)?.trim();
+    const address = (formData.get("address") as string)?.trim();
+    const status = formData.get("status") as string;
+    const note = (formData.get("note") as string)?.trim() || null;
 
-  if (!orderId || !customerName || !phone || !city || !address) return;
-  if (!VALID_STATUSES.has(status as never)) return;
+    if (!orderId || !customerName || !phone || !city || !address) return { error: "بيانات ناقصة" };
+    if (!VALID_STATUSES.has(status as never)) return { error: "حالة غير صالحة" };
 
-  await db.order.update({
-    where: { id: orderId },
-    data: { customerName, phone, city, address, status, note },
-  });
+    await db.order.update({
+      where: { id: orderId },
+      data: { customerName, phone, city, address, status, note },
+    });
 
-  revalidatePath("/admin/orders");
-  revalidatePath(`/admin/orders/${orderId}`);
-  redirect(`/admin/orders/${orderId}`);
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${orderId}`);
+    return { success: true, message: "تم تحديث الطلب بنجاح" };
+  } catch (error) {
+    return { error: "حدث خطأ أثناء تحديث الطلب" };
+  }
 }
 
-export async function deleteOrderAction(orderId: string) {
-  await requireAdmin();
-  await db.order.delete({ where: { id: orderId } });
-  revalidatePath("/admin/orders");
-  redirect("/admin/orders");
+export async function deleteOrderAction(orderId: string, prevState?: any, formData?: FormData) {
+  try {
+    await requireAdmin();
+    await db.order.delete({ where: { id: orderId } });
+    revalidatePath("/admin/orders");
+    return { success: true, message: "تم حذف الطلب بنجاح" };
+  } catch (error) {
+    return { error: "حدث خطأ أثناء حذف الطلب" };
+  }
 }

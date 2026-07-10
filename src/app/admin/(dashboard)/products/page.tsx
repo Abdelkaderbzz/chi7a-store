@@ -1,10 +1,9 @@
 import { db } from "@/lib/db";
-import { createProductAction, deleteProductAction } from "@/lib/actions";
-import { ImageUpload } from "@/components/admin/ImageUpload";
-import { FormSelect } from "@/components/ui/form-select";
+import { deleteProductAction } from "@/lib/actions";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
+import { DeleteButton } from "@/components/admin/ActionForm";
+import { ProductClientForm } from "@/components/admin/ProductClientForm";
 
 export default async function AdminProductsPage() {
   const [products, categories] = await Promise.all([
@@ -21,51 +20,7 @@ export default async function AdminProductsPage() {
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Add form */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold mb-4 flex items-center gap-2">
-            <Plus size={18} />
-            إضافة منتج
-          </h2>
-          <form action={createProductAction} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">الاسم (إنجليزي)</label>
-              <input name="name" required className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">الاسم (عربي)</label>
-              <input name="nameAr" required className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">التصنيف</label>
-              <FormSelect
-                name="categoryId"
-                options={categories.map((c) => ({ value: c.id, label: c.nameAr }))}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">السعر (د.ت)</label>
-              <input name="price" type="number" step="0.001" required className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">الوصف (عربي)</label>
-              <textarea name="descriptionAr" rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <ImageUpload />
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="featured" className="rounded" />
-                مميز
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="inStock" defaultChecked className="rounded" />
-                متوفر
-              </label>
-            </div>
-            <button type="submit" className="w-full bg-gold text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gold-dark">
-              إضافة
-            </button>
-          </form>
-        </div>
+        <ProductClientForm categories={categories} />
 
         {/* Products list */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200">
@@ -90,11 +45,7 @@ export default async function AdminProductsPage() {
                     {!product.inStock && <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded">نفذ</span>}
                   </div>
                 </div>
-                <form action={deleteProductAction.bind(null, product.id)}>
-                  <button type="submit" className="text-red-400 hover:text-red-600 p-2">
-                    <Trash2 size={16} />
-                  </button>
-                </form>
+                <DeleteButton action={deleteProductAction.bind(null, product.id)} />
               </div>
             ))}
             {products.length === 0 && (

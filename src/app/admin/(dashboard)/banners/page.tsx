@@ -1,8 +1,8 @@
 import { db } from "@/lib/db";
-import { createBannerAction, deleteBannerAction } from "@/lib/actions";
-import { ImageUpload } from "@/components/admin/ImageUpload";
-import { Plus, Trash2 } from "lucide-react";
+import { deleteBannerAction } from "@/lib/actions";
 import Image from "next/image";
+import { DeleteButton } from "@/components/admin/ActionForm";
+import { BannerClientForm } from "@/components/admin/BannerClientForm";
 
 export default async function AdminBannersPage() {
   const banners = await db.banner.findMany({ orderBy: { order: "asc" } });
@@ -12,42 +12,7 @@ export default async function AdminBannersPage() {
       <h1 className="text-2xl font-bold mb-8">إدارة البانرات</h1>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold mb-4 flex items-center gap-2">
-            <Plus size={18} />
-            إضافة بانر
-          </h2>
-          <form action={createBannerAction} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">العنوان (إنجليزي)</label>
-              <input name="title" required className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">العنوان (عربي)</label>
-              <input name="titleAr" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">الوصف (عربي)</label>
-              <input name="subtitleAr" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">الرابط</label>
-              <input name="link" placeholder="/products" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">الترتيب</label>
-              <input name="order" type="number" defaultValue={0} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <ImageUpload label="صورة البانر" />
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="active" defaultChecked className="rounded" />
-              نشط
-            </label>
-            <button type="submit" className="w-full bg-gold text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gold-dark">
-              إضافة
-            </button>
-          </form>
-        </div>
+        <BannerClientForm />
 
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200">
           <div className="p-5 border-b border-gray-100">
@@ -66,11 +31,7 @@ export default async function AdminBannersPage() {
                     {banner.link && ` • ${banner.link}`}
                   </p>
                 </div>
-                <form action={deleteBannerAction.bind(null, banner.id)}>
-                  <button type="submit" className="text-red-400 hover:text-red-600 p-2">
-                    <Trash2 size={16} />
-                  </button>
-                </form>
+                <DeleteButton action={deleteBannerAction.bind(null, banner.id)} />
               </div>
             ))}
             {banners.length === 0 && (
