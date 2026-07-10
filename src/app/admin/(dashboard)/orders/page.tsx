@@ -6,8 +6,9 @@ import { formatOrderDate, formatOrderDisplayId } from "@/lib/order-status";
 import { OrdersFilters } from "@/components/admin/OrdersFilters";
 import { OrderStatusBadge } from "@/components/admin/OrderStatusBadge";
 import { deleteOrderAction } from "@/lib/order-actions";
-import { Eye, Pencil, Trash2, Truck, ClipboardList } from "lucide-react";
+import { Eye, Pencil, Truck, ClipboardList } from "lucide-react";
 import type { Prisma } from "@/generated/prisma/client";
+import { DeleteButton } from "@/components/admin/ActionForm";
 
 type SearchParams = Promise<{ q?: string; status?: string }>;
 
@@ -159,15 +160,7 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
                         >
                           <Pencil size={16} />
                         </Link>
-                        <form action={deleteOrderAction.bind(null, order.id)}>
-                          <button
-                            type="submit"
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="حذف"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </form>
+                        <DeleteButton action={deleteOrderAction.bind(null, order.id)} />
                       </div>
                     </td>
                   </tr>

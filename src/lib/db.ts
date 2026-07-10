@@ -11,7 +11,7 @@ function resolveDatabaseUrl() {
   const filePath = url.slice("file:".length);
   if (path.isAbsolute(filePath)) return url;
 
-  return `file:${path.join(process.cwd(), filePath)}`;
+  return `file:${path.join(/*turbopackIgnore: true*/ process.cwd(), filePath)}`;
 }
 
 function createPrismaClient() {

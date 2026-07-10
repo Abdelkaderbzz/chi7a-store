@@ -2,9 +2,11 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 
-const SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "chi7a-store-secret-key-change-in-production"
-);
+if (!process.env.AUTH_SECRET) {
+  throw new Error("AUTH_SECRET environment variable is missing!");
+}
+
+const SECRET = new TextEncoder().encode(process.env.AUTH_SECRET);
 
 const COOKIE_NAME = "chi7a-admin-token";
 
