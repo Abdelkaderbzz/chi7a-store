@@ -56,7 +56,9 @@ export async function createCategoryAction(prevState: any, formData: FormData) {
     revalidatePath("/admin/categories");
     return { success: true, message: "تمت إضافة التصنيف بنجاح" };
   } catch (error: any) {
-    return { error: "حدث خطأ أثناء الإضافة" };
+    console.error("Create Category Error:", error);
+    if (error?.code === "P2002") return { error: "هذا التصنيف أو الاسم موجود بالفعل!" };
+    return { error: error?.message || "حدث خطأ أثناء الإضافة" };
   }
 }
 
@@ -135,6 +137,8 @@ export async function createProductAction(prevState: any, formData: FormData) {
     revalidatePath("/admin/products");
     return { success: true, message: "تمت إضافة المنتج بنجاح" };
   } catch (error: any) {
+    console.error("Create Product Error:", error);
+    if (error?.code === "P2002") return { error: "هذا المنتج أو الاسم موجود بالفعل!" };
     return { error: "حدث خطأ أثناء إضافة المنتج" };
   }
 }
@@ -206,7 +210,8 @@ export async function createBannerAction(prevState: any, formData: FormData) {
     revalidatePath("/admin/banners");
     return { success: true, message: "تمت إضافة البانر بنجاح" };
   } catch (error: any) {
-    return { error: "حدث خطأ أثناء الإضافة" };
+    console.error("Create Banner Error:", error);
+    return { error: error?.message || "حدث خطأ أثناء الإضافة" };
   }
 }
 

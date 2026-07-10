@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProductSchema, type ProductValues } from "@/lib/validations";
 import { createProductAction } from "@/lib/actions";
@@ -20,6 +20,7 @@ export function ProductClientForm({ categories }: { categories: Category[] }) {
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -92,9 +93,17 @@ export function ProductClientForm({ categories }: { categories: Category[] }) {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">التصنيف</label>
-          <FormSelect
-            {...register("categoryId")}
-            options={categories.map((c) => ({ value: c.id, label: c.nameAr }))}
+          <Controller
+            name="categoryId"
+            control={control}
+            render={({ field }) => (
+              <FormSelect
+                name={field.name}
+                value={field.value}
+                onValueChange={field.onChange}
+                options={categories.map((c) => ({ value: c.id, label: c.nameAr }))}
+              />
+            )}
           />
           {errors.categoryId && <p className="text-xs text-red-500 mt-1">{errors.categoryId.message}</p>}
         </div>

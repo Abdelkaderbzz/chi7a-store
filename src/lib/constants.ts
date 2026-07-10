@@ -13,3 +13,30 @@ export const STORE_INFO = {
   facebook: "https://www.facebook.com/Chi7aStore",
   whatsapp: "https://wa.me/21626321100",
 };
+
+export const tunisianStates = [
+  { value: "Ariana", label: "Ariana", arabic: "أريانة" },
+  { value: "Beja", label: "Béja", arabic: "باجة" },
+  { value: "Ben Arous", label: "Ben Arous", arabic: "بن عروس" },
+  { value: "Bizerte", label: "Bizerte", arabic: "بنزرت" },
+  { value: "Gabes", label: "Gabès", arabic: "قابس" },
+  { value: "Gafsa", label: "Gafsa", arabic: "قفصة" },
+  { value: "Jendouba", label: "Jendouba", arabic: "جندوبة" },
+  { value: "Kairouan", label: "Kairouan", arabic: "القيروان" },
+  { value: "Kasserine", label: "Kasserine", arabic: "القصرين" },
+  { value: "Kebili", label: "Kebili", arabic: "قبلي" },
+  { value: "Kef", label: "Kef", arabic: "الكاف" },
+  { value: "Mahdia", label: "Mahdia", arabic: "المهدية" },
+  { value: "Manouba", label: "Manouba", arabic: "منوبة" },
+  { value: "Medenine", label: "Medenine", arabic: "مدنين" },
+  { value: "Monastir", label: "Monastir", arabic: "المنستير" },
+  { value: "Nabeul", label: "Nabeul", arabic: "نابل" },
+  { value: "Sfax", label: "Sfax", arabic: "صفاقس" },
+  { value: "Sidi Bouzid", label: "Sidi Bouzid", arabic: "سيدي بوزيد" },
+  { value: "Siliana", label: "Siliana", arabic: "سليانة" },
+  { value: "Sousse", label: "Sousse", arabic: "سوسة" },
+  { value: "Tataouine", label: "Tataouine", arabic: "تطاوين" },
+  { value: "Tozeur", label: "Tozeur", arabic: "توزر" },
+  { value: "Tunis", label: "Tunis", arabic: "تونس" },
+  { value: "Zaghouan", label: "Zaghouan", arabic: "زغوان" }
+];

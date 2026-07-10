@@ -22,6 +22,8 @@ interface FormSelectProps {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
 }
 
 /**
@@ -32,16 +34,26 @@ export function FormSelect({
   name,
   options,
   defaultValue,
+  value: externalValue,
+  onValueChange: externalOnChange,
   placeholder,
   required,
   className,
 }: FormSelectProps) {
-  const [value, setValue] = useState(defaultValue ?? "");
+  const [internalValue, setInternalValue] = useState(defaultValue ?? "");
+  
+  const isControlled = externalValue !== undefined;
+  const value = isControlled ? externalValue : internalValue;
+  
+  const handleValueChange = (v: string) => {
+    if (!isControlled) setInternalValue(v);
+    externalOnChange?.(v);
+  };
 
   return (
     <>
       <input type="hidden" name={name} value={value} required={required} />
-      <Select value={value || undefined} onValueChange={setValue}>
+      <Select value={value || undefined} onValueChange={handleValueChange}>
         <SelectTrigger className={cn(className)}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
