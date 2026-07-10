@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  nameAr      String
+  slug        String    @unique
+  description String?
+  image       String?
+  order       Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  nameAr        String
+  slug          String   @unique
+  description   String?
+  descriptionAr String?
+  price         Float
+  image         String?
+  images        String   @default("[]")
+  featured      Boolean  @default(false)
+  inStock       Boolean  @default(true)
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  titleAr   String?
+  subtitle  String?
+  subtitleAr String?
+  image     String
+  link      String?
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  orderNumber  String      @unique
+  customerName String
+  phone        String
+  city         String
+  address      String
+  note         String?
+  status       String      @default("pending")
+  total        Float
+  items        OrderItem[]
+  createdAt    DateTime    @default(now())
+}
+
+model OrderItem {
+  id            String @id @default(cuid())
+  orderId       String
+  order         Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String
+  productName   String
+  productNameAr String
+  price         Float
+  quantity      Int
+  image         String?
+}
