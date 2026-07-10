@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chi7a Store
 
-## Getting Started
+متجر إلكتروني بسيط لـ **Chi7a Store** — محل للجوال والإلكترونيات في دوز، تونس.
 
-First, run the development server:
+## المميزات
+
+### المتجر (للعملاء)
+- الصفحة الرئيسية مع بانرات ومنتجات مميزة
+- تصفح المنتجات حسب التصنيف (آيفون، أندرويد، أجهزة لوحية، باور بانك، سماعات، ساعات ذكية...)
+- صفحة تفاصيل المنتج مع طلب عبر واتساب
+- صفحة اتصل بنا
+- واجهة عربية (RTL) بألوان العلامة التجارية الذهبية
+
+### لوحة الإدارة
+- تسجيل دخول آمن
+- إدارة المنتجات (إضافة، حذف، صور)
+- إدارة التصنيفات
+- إدارة البانرات
+- رفع الصور
+
+## التشغيل
 
 ```bash
+# تثبيت الحزم
+npm install
+
+# إعداد قاعدة البيانات
+npm run db:setup
+
+# تشغيل السيرفر
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **المتجر:** http://localhost:3000
+- **لوحة الإدارة:** http://localhost:3000/admin/login
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### بيانات الدخول الافتراضية
+- البريد: `admin@chi7astore.tn`
+- كلمة المرور: `admin123`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> غيّر كلمة المرور و `AUTH_SECRET` في `.env` قبل النشر.
 
-## Learn More
+## التقنيات
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js 16 (App Router)
+- Prisma + SQLite
+- Tailwind CSS
+- TypeScript
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## معلومات المتجر
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **الهاتف:** +216 26 321 100
+- **فيسبوك:** https://www.facebook.com/Chi7aStore
+- **الموقع:** دوز، تونس
