@@ -31,7 +31,7 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-b from-gold/10 via-background to-background">
+      <section className="border-b border-border bg-linear-to-b from-gold/10 via-background to-background">
         <div className="container-page py-8">
           <BannerCarousel banners={banners} />
 

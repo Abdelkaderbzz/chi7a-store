@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/components/store/AddToCartButton";
 import { ProductCard } from "@/components/store/ProductCard";
 import { CategoryIcon } from "@/components/store/CategoryIcon";
+import { ProductGallery } from "@/components/store/ProductGallery";
 import { ArrowRight, Phone, MessageCircle, CheckCircle2, XCircle } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -48,15 +49,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-gray-50 to-gray-100">
-          {product.image ? (
-            <Image src={product.image} alt={product.nameAr} fill className="object-cover" priority />
-          ) : (
-            <div className="flex h-full items-center justify-center text-gray-300">
-              <CategoryIcon slug={product.category.slug} size={80} className="text-gray-300" />
-            </div>
-          )}
-        </div>
+        <ProductGallery
+          imagesString={product.images}
+          fallbackImage={product.image}
+          productName={product.nameAr}
+          categorySlug={product.category.slug}
+        />
 
         <div className="flex flex-col">
           <Link

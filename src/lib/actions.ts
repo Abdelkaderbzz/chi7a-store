@@ -5,6 +5,13 @@ import { getAdminSession, createToken, verifyPassword, setAdminCookie, clearAdmi
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { slugify } from "@/lib/utils";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 async function requireAdmin() {
   const adminId = await getAdminSession();
@@ -33,148 +40,210 @@ export async function logoutAction() {
 }
 
 // Categories
-export async function createCategoryAction(formData: FormData) {
-  await requireAdmin();
-  const name = formData.get("name") as string;
-  const nameAr = formData.get("nameAr") as string;
-  const description = (formData.get("description") as string) || null;
-  const image = (formData.get("image") as string) || null;
-  const order = parseInt(formData.get("order") as string) || 0;
+export async function createCategoryAction(prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    const name = formData.get("name") as string;
+    const nameAr = formData.get("nameAr") as string;
+    const description = (formData.get("description") as string) || null;
+    const image = (formData.get("image") as string) || null;
+    const order = parseInt(formData.get("order") as string) || 0;
 
-  await db.category.create({
-    data: { name, nameAr, slug: slugify(name), description, image, order },
-  });
-  revalidatePath("/");
-  revalidatePath("/admin/categories");
+    await db.category.create({
+      data: { name, nameAr, slug: slugify(name), description, image, order },
+    });
+    revalidatePath("/");
+    revalidatePath("/admin/categories");
+    return { success: true, message: "تمت إضافة التصنيف بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء الإضافة" };
+  }
 }
 
-export async function updateCategoryAction(id: string, formData: FormData) {
-  await requireAdmin();
-  const name = formData.get("name") as string;
-  const nameAr = formData.get("nameAr") as string;
-  const description = (formData.get("description") as string) || null;
-  const image = (formData.get("image") as string) || null;
-  const order = parseInt(formData.get("order") as string) || 0;
+export async function updateCategoryAction(id: string, prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    const name = formData.get("name") as string;
+    const nameAr = formData.get("nameAr") as string;
+    const description = (formData.get("description") as string) || null;
+    const image = (formData.get("image") as string) || null;
+    const order = parseInt(formData.get("order") as string) || 0;
 
-  await db.category.update({
-    where: { id },
-    data: { name, nameAr, description, image, order },
-  });
-  revalidatePath("/");
-  revalidatePath("/admin/categories");
+    await db.category.update({
+      where: { id },
+      data: { name, nameAr, description, image, order },
+    });
+    revalidatePath("/");
+    revalidatePath("/admin/categories");
+    return { success: true, message: "تم تحديث التصنيف بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء التحديث" };
+  }
 }
 
-export async function deleteCategoryAction(id: string) {
-  await requireAdmin();
-  await db.category.delete({ where: { id } });
-  revalidatePath("/");
-  revalidatePath("/admin/categories");
+export async function deleteCategoryAction(id: string, prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    await db.category.delete({ where: { id } });
+    revalidatePath("/");
+    revalidatePath("/admin/categories");
+    return { success: true, message: "تم حذف التصنيف بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء الحذف" };
+  }
 }
 
 // Products
-export async function createProductAction(formData: FormData) {
-  await requireAdmin();
-  const name = formData.get("name") as string;
-  const nameAr = formData.get("nameAr") as string;
-  const description = (formData.get("description") as string) || null;
-  const descriptionAr = (formData.get("descriptionAr") as string) || null;
-  const price = parseFloat(formData.get("price") as string);
-  const image = (formData.get("image") as string) || null;
-  const categoryId = formData.get("categoryId") as string;
-  const featured = formData.get("featured") === "on";
-  const inStock = formData.get("inStock") !== "off";
+export async function createProductAction(prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    const name = formData.get("name") as string;
+    const nameAr = formData.get("nameAr") as string;
+    const description = (formData.get("description") as string) || null;
+    const descriptionAr = (formData.get("descriptionAr") as string) || null;
+    const price = parseFloat(formData.get("price") as string);
+    const imagesStr = (formData.get("images") as string) || "[]";
+    let imagesArr: string[] = [];
+    try {
+      imagesArr = JSON.parse(imagesStr);
+    } catch {
+      imagesArr = [];
+    }
+    const image = imagesArr.length > 0 ? imagesArr[0] : null;
 
-  await db.product.create({
-    data: {
-      name,
-      nameAr,
-      slug: slugify(name),
-      description,
-      descriptionAr,
-      price,
-      image,
-      categoryId,
-      featured,
-      inStock,
-    },
-  });
-  revalidatePath("/");
-  revalidatePath("/products");
-  revalidatePath("/admin/products");
+    const categoryId = formData.get("categoryId") as string;
+    const featured = formData.get("featured") === "on";
+    const inStock = formData.get("inStock") !== "off";
+
+    await db.product.create({
+      data: {
+        name,
+        nameAr,
+        slug: slugify(name),
+        description,
+        descriptionAr,
+        price,
+        image,
+        images: JSON.stringify(imagesArr),
+        categoryId,
+        featured,
+        inStock,
+      },
+    });
+    revalidatePath("/");
+    revalidatePath("/products");
+    revalidatePath("/admin/products");
+    return { success: true, message: "تمت إضافة المنتج بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء إضافة المنتج" };
+  }
 }
 
-export async function updateProductAction(id: string, formData: FormData) {
-  await requireAdmin();
-  const name = formData.get("name") as string;
-  const nameAr = formData.get("nameAr") as string;
-  const description = (formData.get("description") as string) || null;
-  const descriptionAr = (formData.get("descriptionAr") as string) || null;
-  const price = parseFloat(formData.get("price") as string);
-  const image = (formData.get("image") as string) || null;
-  const categoryId = formData.get("categoryId") as string;
-  const featured = formData.get("featured") === "on";
-  const inStock = formData.get("inStock") !== "off";
+export async function updateProductAction(id: string, prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    const name = formData.get("name") as string;
+    const nameAr = formData.get("nameAr") as string;
+    const description = (formData.get("description") as string) || null;
+    const descriptionAr = (formData.get("descriptionAr") as string) || null;
+    const price = parseFloat(formData.get("price") as string);
+    const imagesStr = (formData.get("images") as string) || "[]";
+    let imagesArr: string[] = [];
+    try {
+      imagesArr = JSON.parse(imagesStr);
+    } catch {
+      imagesArr = [];
+    }
+    const image = imagesArr.length > 0 ? imagesArr[0] : null;
 
-  await db.product.update({
-    where: { id },
-    data: { name, nameAr, description, descriptionAr, price, image, categoryId, featured, inStock },
-  });
-  revalidatePath("/");
-  revalidatePath("/products");
-  revalidatePath("/admin/products");
+    const categoryId = formData.get("categoryId") as string;
+    const featured = formData.get("featured") === "on";
+    const inStock = formData.get("inStock") !== "off";
+
+    await db.product.update({
+      where: { id },
+      data: { name, nameAr, description, descriptionAr, price, image, images: JSON.stringify(imagesArr), categoryId, featured, inStock },
+    });
+    revalidatePath("/");
+    revalidatePath("/products");
+    revalidatePath("/admin/products");
+    return { success: true, message: "تم تحديث المنتج بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء تحديث المنتج" };
+  }
 }
 
-export async function deleteProductAction(id: string) {
-  await requireAdmin();
-  await db.product.delete({ where: { id } });
-  revalidatePath("/");
-  revalidatePath("/products");
-  revalidatePath("/admin/products");
+export async function deleteProductAction(id: string, prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    await db.product.delete({ where: { id } });
+    revalidatePath("/");
+    revalidatePath("/products");
+    revalidatePath("/admin/products");
+    return { success: true, message: "تم حذف المنتج بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء الحذف" };
+  }
 }
 
 // Banners
-export async function createBannerAction(formData: FormData) {
-  await requireAdmin();
-  const title = formData.get("title") as string;
-  const titleAr = (formData.get("titleAr") as string) || null;
-  const subtitle = (formData.get("subtitle") as string) || null;
-  const subtitleAr = (formData.get("subtitleAr") as string) || null;
-  const image = formData.get("image") as string;
-  const link = (formData.get("link") as string) || null;
-  const order = parseInt(formData.get("order") as string) || 0;
-  const active = formData.get("active") !== "off";
+export async function createBannerAction(prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    const title = formData.get("title") as string;
+    const titleAr = (formData.get("titleAr") as string) || null;
+    const subtitle = (formData.get("subtitle") as string) || null;
+    const subtitleAr = (formData.get("subtitleAr") as string) || null;
+    const image = formData.get("image") as string;
+    const link = (formData.get("link") as string) || null;
+    const order = parseInt(formData.get("order") as string) || 0;
+    const active = formData.get("active") !== "off";
 
-  await db.banner.create({
-    data: { title, titleAr, subtitle, subtitleAr, image, link, order, active },
-  });
-  revalidatePath("/");
-  revalidatePath("/admin/banners");
+    await db.banner.create({
+      data: { title, titleAr, subtitle, subtitleAr, image, link, order, active },
+    });
+    revalidatePath("/");
+    revalidatePath("/admin/banners");
+    return { success: true, message: "تمت إضافة البانر بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء الإضافة" };
+  }
 }
 
-export async function updateBannerAction(id: string, formData: FormData) {
-  await requireAdmin();
-  const title = formData.get("title") as string;
-  const titleAr = (formData.get("titleAr") as string) || null;
-  const subtitle = (formData.get("subtitle") as string) || null;
-  const subtitleAr = (formData.get("subtitleAr") as string) || null;
-  const image = formData.get("image") as string;
-  const link = (formData.get("link") as string) || null;
-  const order = parseInt(formData.get("order") as string) || 0;
-  const active = formData.get("active") !== "off";
+export async function updateBannerAction(id: string, prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    const title = formData.get("title") as string;
+    const titleAr = (formData.get("titleAr") as string) || null;
+    const subtitle = (formData.get("subtitle") as string) || null;
+    const subtitleAr = (formData.get("subtitleAr") as string) || null;
+    const image = formData.get("image") as string;
+    const link = (formData.get("link") as string) || null;
+    const order = parseInt(formData.get("order") as string) || 0;
+    const active = formData.get("active") !== "off";
 
-  await db.banner.update({
-    where: { id },
-    data: { title, titleAr, subtitle, subtitleAr, image, link, order, active },
-  });
-  revalidatePath("/");
-  revalidatePath("/admin/banners");
+    await db.banner.update({
+      where: { id },
+      data: { title, titleAr, subtitle, subtitleAr, image, link, order, active },
+    });
+    revalidatePath("/");
+    revalidatePath("/admin/banners");
+    return { success: true, message: "تم تحديث البانر بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء التحديث" };
+  }
 }
 
-export async function deleteBannerAction(id: string) {
-  await requireAdmin();
-  await db.banner.delete({ where: { id } });
-  revalidatePath("/");
-  revalidatePath("/admin/banners");
+export async function deleteBannerAction(id: string, prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+    await db.banner.delete({ where: { id } });
+    revalidatePath("/");
+    revalidatePath("/admin/banners");
+    return { success: true, message: "تم حذف البانر بنجاح" };
+  } catch (error: any) {
+    return { error: "حدث خطأ أثناء الحذف" };
+  }
 }
 
 // Upload
@@ -183,16 +252,18 @@ export async function uploadImageAction(formData: FormData) {
   const file = formData.get("file") as File;
   if (!file || file.size === 0) return { error: "No file" };
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const ext = file.name.split(".").pop() || "jpg";
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const base64Image = `data:${file.type};base64,${buffer.toString("base64")}`;
 
-  const fs = await import("fs/promises");
-  const path = await import("path");
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await fs.mkdir(uploadDir, { recursive: true });
-  await fs.writeFile(path.join(uploadDir, filename), buffer);
+    const response = await cloudinary.uploader.upload(base64Image, {
+      folder: "chi7a-store",
+    });
 
-  return { url: `/uploads/${filename}` };
+    return { url: response.secure_url };
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    return { error: "فشل تحميل الصورة" };
+  }
 }
