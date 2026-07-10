@@ -8,6 +8,7 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { useCart } from "@/components/store/CartProvider";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
+import { FormSelect } from "@/components/ui/form-select";
 import { formatPrice } from "@/lib/utils";
 import { getCartTotal } from "@/lib/cart";
 import { placeOrderAction } from "@/lib/order-actions";
@@ -85,20 +86,14 @@ export default function CheckoutPage() {
               className="text-left"
             />
             <div className="space-y-1.5">
-              <label htmlFor="city" className="block text-sm font-medium">المدينة</label>
-              <input
-                id="city"
+              <label className="block text-sm font-medium">المدينة</label>
+              <FormSelect
                 name="city"
-                list="cities"
                 required
-                placeholder="مثال: دوز"
-                className="flex h-11 w-full rounded-xl border border-border bg-white px-4 text-sm outline-none focus:border-gold/60 focus:ring-4 focus:ring-[var(--ring)]"
+                defaultValue="دوز"
+                placeholder="اختر المدينة"
+                options={TUNISIAN_CITIES.map((c) => ({ value: c, label: c }))}
               />
-              <datalist id="cities">
-                {TUNISIAN_CITIES.map((c) => (
-                  <option key={c} value={c} />
-                ))}
-              </datalist>
             </div>
             <Textarea
               name="address"

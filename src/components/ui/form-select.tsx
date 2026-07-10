@@ -8,6 +8,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface Option {
   value: string;
@@ -19,20 +20,29 @@ interface FormSelectProps {
   options: Option[];
   defaultValue?: string;
   placeholder?: string;
+  required?: boolean;
+  className?: string;
 }
 
 /**
  * Radix Select that also submits its value inside a native <form> (server actions)
  * by mirroring the selection into a hidden input.
  */
-export function FormSelect({ name, options, defaultValue, placeholder }: FormSelectProps) {
-  const [value, setValue] = useState(defaultValue ?? options[0]?.value ?? "");
+export function FormSelect({
+  name,
+  options,
+  defaultValue,
+  placeholder,
+  required,
+  className,
+}: FormSelectProps) {
+  const [value, setValue] = useState(defaultValue ?? "");
 
   return (
     <>
-      <input type="hidden" name={name} value={value} />
-      <Select value={value} onValueChange={setValue}>
-        <SelectTrigger>
+      <input type="hidden" name={name} value={value} required={required} />
+      <Select value={value || undefined} onValueChange={setValue}>
+        <SelectTrigger className={cn(className)}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>

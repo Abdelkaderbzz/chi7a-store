@@ -1,8 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { ORDER_STATUSES } from "@/lib/order-status";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 type OrdersFiltersProps = {
   q: string;
@@ -11,6 +19,14 @@ type OrdersFiltersProps = {
 
 export function OrdersFilters({ q, status }: OrdersFiltersProps) {
   const router = useRouter();
+  const [statusValue, setStatusValue] = useState(status || "all");
+
+  function applyFilters(query: string, nextStatus: string) {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (nextStatus && nextStatus !== "all") params.set("status", nextStatus);
+    router.push(`/admin/orders?${params.toString()}`);
+  }
 
   return (
     <form
@@ -18,12 +34,7 @@ export function OrdersFilters({ q, status }: OrdersFiltersProps) {
       onSubmit={(e) => {
         e.preventDefault();
         const data = new FormData(e.currentTarget);
-        const params = new URLSearchParams();
-        const query = (data.get("q") as string)?.trim();
-        const statusVal = data.get("status") as string;
-        if (query) params.set("q", query);
-        if (statusVal) params.set("status", statusVal);
-        router.push(`/admin/orders?${params.toString()}`);
+        applyFilters((data.get("q") as string) ?? "", statusValue);
       }}
     >
       <div className="flex flex-1 min-w-[220px] items-center gap-2 border border-gray-200 rounded-lg px-3 py-2">
@@ -37,18 +48,21 @@ export function OrdersFilters({ q, status }: OrdersFiltersProps) {
         />
       </div>
 
-      <select
-        name="status"
-        defaultValue={status}
-        className="text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white min-w-[140px]"
-      >
-        <option value="">كل الحالات</option>
-        {ORDER_STATUSES.map((s) => (
-          <option key={s.value} value={s.value}>
-            {s.label}
-          </option>
-        ))}
-      </select>
+      <div className="min-w-[160px]">
+        <Select value={statusValue} onValueChange={setStatusValue}>
+          <SelectTrigger className="h-10">
+            <SelectValue placeholder="كل الحالات" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">كل الحالات</SelectItem>
+            {ORDER_STATUSES.map((s) => (
+              <SelectItem key={s.value} value={s.value}>
+                {s.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <button
         type="submit"

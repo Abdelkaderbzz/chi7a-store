@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
+import { FormSelect } from "@/components/ui/form-select";
 import { ORDER_STATUSES } from "@/lib/order-status";
 import { updateOrderAction } from "@/lib/order-actions";
 import { OrderStatusBadge } from "@/components/admin/OrderStatusBadge";
@@ -42,17 +43,11 @@ export function OrderEditForm({ order }: OrderEditFormProps) {
         <div className="p-5 space-y-5">
           <div>
             <label className="block text-sm font-medium mb-2">الحالة</label>
-            <select
+            <FormSelect
               name="status"
               defaultValue={order.status}
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white"
-            >
-              {ORDER_STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+              options={ORDER_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+            />
             <div className="flex flex-wrap gap-2 mt-3">
               {ORDER_STATUSES.map((s) => (
                 <OrderStatusBadge key={s.value} status={s.value} />
