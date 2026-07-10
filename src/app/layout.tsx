@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import { Cairo } from "next/font/google";
 import "./globals.css";
 import { STORE_INFO } from "@/lib/constants";
-
-const cairo = Cairo({
-  variable: "--font-cairo",
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: {
@@ -16,9 +10,9 @@ export const metadata: Metadata = {
   },
   description: STORE_INFO.welcome,
   icons: {
-    icon: [{ url: "/logo.png", type: "image/png" }],
-    apple: [{ url: "/logo.png", type: "image/png" }],
-    shortcut: ["/logo.png"],
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/icon.png", type: "image/png" }],
+    shortcut: ["/icon.png"],
   },
 };
 
@@ -27,11 +21,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="ar"
       dir="rtl"
-      className={`${cairo.variable} h-full antialiased`}
+      className="h-full antialiased"
       suppressHydrationWarning
     >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400..700&display=swap" rel="stylesheet" />
+        <style>{`
+          :root {
+            --font-cairo: 'Cairo', sans-serif;
+          }
+        `}</style>
+      </head>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         {children}
+        <Toaster position="top-center" richColors dir="rtl" toastOptions={{ className: "font-sans text-[15px]" }} />
       </body>
     </html>
   );
