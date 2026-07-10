@@ -12,6 +12,9 @@ import { FormSelect } from "@/components/ui/form-select";
 import { formatPrice } from "@/lib/utils";
 import { getCartTotal } from "@/lib/cart";
 import { placeOrderAction } from "@/lib/order-actions";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckoutSchema, type CheckoutValues } from "@/lib/validations";
 
 const TUNISIAN_CITIES = [
   "دوز", "قبلي", "تونس", "صفاقس", "سوسة", "المنستير", "المهدية",
@@ -26,6 +29,17 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const total = getCartTotal(items);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CheckoutValues>({
+    resolver: zodResolver(CheckoutSchema),
+    defaultValues: {
+      city: "قبلي",
+    },
+  });
+
   if (items.length === 0) {
     return (
       <div className="container-page py-20 text-center">
@@ -37,17 +51,15 @@ export default function CheckoutPage() {
     );
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function onSubmit(data: CheckoutValues) {
     setLoading(true);
     setError("");
 
-    const form = new FormData(e.currentTarget);
     const result = await placeOrderAction({
-      customerName: form.get("name") as string,
-      phone: form.get("phone") as string,
-      city: form.get("city") as string,
-      address: form.get("address") as string,
+      customerName: data.name,
+      phone: data.phone,
+      city: data.city,
+      address: data.address,
       items: items.map((i) => ({ productId: i.id, quantity: i.quantity })),
     });
 
@@ -67,7 +79,7 @@ export default function CheckoutPage() {
       <h1 className="mb-6 text-2xl font-bold">إتمام الطلب</h1>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
             <h2 className="font-bold">معلومات التوصيل</h2>
 
@@ -75,32 +87,36 @@ export default function CheckoutPage() {
               <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
             )}
 
-            <Input name="name" label="الاسم الكامل" required placeholder="مثال: أحمد بن علي" />
             <Input
-              name="phone"
+              {...register("name")}
+              label="الاسم الكامل"
+              placeholder="مثال: أحمد بن علي"
+              error={errors.name?.message}
+            />
+            <Input
+              {...register("phone")}
               label="رقم الهاتف"
-              required
               type="tel"
-              placeholder="مثال: 26 321 100"
+              placeholder="مثال: 26321100"
               dir="ltr"
               className="text-left"
+              error={errors.phone?.message}
             />
             <div className="space-y-1.5">
               <label className="block text-sm font-medium">المدينة</label>
               <FormSelect
-                name="city"
-                required
-                defaultValue="قبلي"
+                {...register("city")}
                 placeholder="اختر المدينة"
                 options={TUNISIAN_CITIES.map((c) => ({ value: c, label: c }))}
               />
+              {errors.city?.message && <p className="text-xs text-red-500">{errors.city.message}</p>}
             </div>
             <Textarea
-              name="address"
+              {...register("address")}
               label="العنوان"
-              required
               placeholder="الشارع، الحي، رقم المنزل..."
               rows={3}
+              error={errors.address?.message}
             />
           </div>
 
