@@ -1,9 +1,7 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/components/store/AddToCartButton";
 import { DirectOrderModal } from "@/components/store/DirectOrderModal";
 import { ProductCard } from "@/components/store/ProductCard";
@@ -11,14 +9,23 @@ import { CategoryIcon } from "@/components/store/CategoryIcon";
 import { ProductGallery } from "@/components/store/ProductGallery";
 import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 
+export async function generateStaticParams() {
+  const products = await db.product.findMany({ select: { slug: true } });
+  return products.map((p) => ({ slug: p.slug }));
+}
+
+export const dynamicParams = true; // fallback to SSR for newly added products
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = await db.product.findUnique({ where: { slug } });
+  const product = await db.product.findUnique({ where: { slug }, select: { nameAr: true } });
   return { title: product?.nameAr || "منتج" };
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+
+  // fetch product and related in parallel
   const product = await db.product.findUnique({
     where: { slug },
     include: { category: true },

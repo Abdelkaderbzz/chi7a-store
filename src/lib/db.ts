@@ -8,7 +8,9 @@ function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL;
   const pool = new Pool({
     connectionString,
-    max: 1,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
     ssl: connectionString?.includes("supabase") ? { rejectUnauthorized: false } : undefined,
   });
   const adapter = new PrismaPg(pool);
@@ -16,8 +18,7 @@ function createPrismaClient() {
 }
 
 function getPrismaClient() {
-  const cached = globalForPrisma.prisma;
-  if (cached && "order" in cached) return cached;
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
 
   const client = createPrismaClient();
   if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = client;

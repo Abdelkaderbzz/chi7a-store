@@ -1,14 +1,9 @@
-import { db } from "@/lib/db";
+import { getCategories } from "@/lib/queries";
 import { Header, Footer } from "@/components/store/Header";
 import { CartProvider } from "@/components/store/CartProvider";
 
-export const dynamic = "force-dynamic";
-
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
-  const categories = await db.category.findMany({
-    orderBy: { order: "asc" },
-    select: { slug: true, nameAr: true, name: true },
-  });
+  const categories = await getCategories();
 
   return (
     <CartProvider>

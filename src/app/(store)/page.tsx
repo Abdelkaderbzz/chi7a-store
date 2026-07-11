@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { getBanners, getCategoriesWithCount } from "@/lib/queries";
 import { BannerCarousel } from "@/components/store/BannerCarousel";
 import { CategoryGrid } from "@/components/store/CategoryGrid";
 import { ProductCard } from "@/components/store/ProductCard";
@@ -15,11 +16,8 @@ const perks = [
 
 export default async function HomePage() {
   const [banners, categories, featuredProducts] = await Promise.all([
-    db.banner.findMany({ where: { active: true }, orderBy: { order: "asc" } }),
-    db.category.findMany({
-      orderBy: { order: "asc" },
-      include: { _count: { select: { products: true } } },
-    }),
+    getBanners(),
+    getCategoriesWithCount(),
     db.product.findMany({
       where: { featured: true },
       include: { category: true },

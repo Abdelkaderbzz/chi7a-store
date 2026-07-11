@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { getCategories } from "@/lib/queries";
 import { ProductCard } from "@/components/store/ProductCard";
 import { CategoryIcon } from "@/components/store/CategoryIcon";
 import Link from "next/link";
@@ -12,7 +13,9 @@ export default async function ProductsPage({
   searchParams: Promise<{ category?: string; q?: string }>;
 }) {
   const params = await searchParams;
-  const categories = await db.category.findMany({ orderBy: { order: "asc" } });
+
+  // categories come from cache; products fetched in parallel
+  const categories = await getCategories();
 
   const where: Record<string, unknown> = {};
   const activeCat = params.category

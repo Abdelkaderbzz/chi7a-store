@@ -4,6 +4,13 @@ import { ProductCard } from "@/components/store/ProductCard";
 import { CategoryIcon } from "@/components/store/CategoryIcon";
 import Link from "next/link";
 
+export async function generateStaticParams() {
+  const categories = await db.category.findMany({ select: { slug: true } });
+  return categories.map((c) => ({ slug: c.slug }));
+}
+
+export const dynamicParams = true;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const category = await db.category.findUnique({ where: { slug } });
