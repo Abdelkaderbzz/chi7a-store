@@ -1,11 +1,11 @@
-import { db } from "@/lib/db";
+import { getAdminBanners } from "@/lib/queries";
 import { deleteBannerAction } from "@/lib/actions";
 import Image from "next/image";
 import { DeleteButton } from "@/components/admin/ActionForm";
 import { BannerClientForm } from "@/components/admin/BannerClientForm";
 
 export default async function AdminBannersPage() {
-  const banners = await db.banner.findMany({ orderBy: { order: "asc" } });
+  const banners = await getAdminBanners();
 
   return (
     <div>
