@@ -10,7 +10,7 @@ import { ProductClientForm } from "@/components/admin/ProductClientForm";
 import { EditProductFormDrawer } from "@/components/admin/EditProductFormDrawer";
 import { toast } from "sonner";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 interface Category {
   id: string;
@@ -50,10 +50,11 @@ export function ProductsTable({ products: initialProducts, categories }: Product
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
-  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
   const safePage = Math.min(page, totalPages);
-  const pageProducts = products.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const pageProducts = products.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const handleDelete = async (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
@@ -62,13 +63,18 @@ export function ProductsTable({ products: initialProducts, categories }: Product
       if (result?.success) {
         const next = products.filter((p) => p.id !== id);
         setProducts(next);
-        const newTotal = Math.max(1, Math.ceil(next.length / PAGE_SIZE));
+        const newTotal = Math.max(1, Math.ceil(next.length / pageSize));
         if (safePage > newTotal) setPage(newTotal);
         toast.success(result.message);
       } else {
         toast.error(result?.error || "حدث خطأ");
       }
     }
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1); // reset to first page when size changes
   };
 
   const handleAddSuccess = () => {
@@ -223,9 +229,25 @@ export function ProductsTable({ products: initialProducts, categories }: Product
 
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 text-sm text-gray-500">
-            <span>
-              {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, products.length)} من {products.length} منتج
-            </span>
+            <div className="flex items-center gap-4">
+              <span>
+                {(safePage - 1) * pageSize + 1}–{Math.min(safePage * pageSize, products.length)} من {products.length} منتج
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs">عرض:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                  className="border border-gray-300 rounded px-2 py-1 text-xs"
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -301,3 +323,4 @@ function AddProductDrawer({ open, onOpenChange, categories, onSuccess }: AddProd
     </div>
   );
 }
+ 
