@@ -8,8 +8,8 @@ import { deleteProductAction } from "@/lib/actions";
 import { getProductStatusFromProduct, getProductStatusLabel, getProductStatusColor } from "@/lib/product-status";
 import { ProductClientForm } from "@/components/admin/ProductClientForm";
 import { EditProductFormDrawer } from "@/components/admin/EditProductFormDrawer";
+import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
-import Link from "next/link";
 
 interface Category {
   id: string;
@@ -48,13 +48,22 @@ export function ProductsTable({ products: initialProducts, categories }: Product
   const [products, setProducts] = useState(initialProducts);
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
+  const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageProducts = products.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const handleDelete = async (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
       const formData = new FormData();
       const result = await deleteProductAction(id, null, formData);
       if (result?.success) {
-        setProducts(products.filter((p) => p.id !== id));
+        const next = products.filter((p) => p.id !== id);
+        setProducts(next);
+        const newTotal = Math.max(1, Math.ceil(next.length / pageSize));
+        if (safePage > newTotal) setPage(newTotal);
         toast.success(result.message);
       } else {
         toast.error(result?.error || "حدث خطأ");
@@ -62,9 +71,13 @@ export function ProductsTable({ products: initialProducts, categories }: Product
     }
   };
 
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1); // reset to first page when size changes
+  };
+
   const handleAddSuccess = () => {
     setShowAddDrawer(false);
-    // Trigger page reload to fetch updated products
     window.location.reload();
   };
 
@@ -75,7 +88,6 @@ export function ProductsTable({ products: initialProducts, categories }: Product
 
   return (
     <>
-      {/* Add Product Drawer */}
       {showAddDrawer && (
         <AddProductDrawer
           open={showAddDrawer}
@@ -85,7 +97,6 @@ export function ProductsTable({ products: initialProducts, categories }: Product
         />
       )}
 
-      {/* Edit Product Drawer */}
       {editingProduct && (
         <EditProductFormDrawer
           product={editingProduct}
@@ -96,7 +107,6 @@ export function ProductsTable({ products: initialProducts, categories }: Product
         />
       )}
 
-      {/* Header with Add Button */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold">المنتجات ({products.length})</h2>
         <button
@@ -108,7 +118,6 @@ export function ProductsTable({ products: initialProducts, categories }: Product
         </button>
       </div>
 
-      {/* Products Table */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -125,14 +134,14 @@ export function ProductsTable({ products: initialProducts, categories }: Product
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {products.length === 0 ? (
+              {pageProducts.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                     لا توجد منتجات
                   </td>
                 </tr>
               ) : (
-                products.map((product) => {
+                pageProducts.map((product) => {
                   const status = getProductStatusFromProduct(product.featured, product.inStock);
                   const statusColor = getProductStatusColor(status);
                   const statusLabel = getProductStatusLabel(status);
@@ -216,6 +225,16 @@ export function ProductsTable({ products: initialProducts, categories }: Product
             </tbody>
           </table>
         </div>
+
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={products.length}
+          itemsLabel="منتج"
+          onPageChange={setPage}
+          onPageSizeChange={handlePageSizeChange}
+        />
       </div>
     </>
   );
@@ -230,23 +249,17 @@ interface AddProductDrawerProps {
 
 function AddProductDrawer({ open, onOpenChange, categories, onSuccess }: AddProductDrawerProps) {
   return (
-    <div
-      className={`fixed inset-0 z-50 ${!open && "hidden"}`}
-    >
-      {/* Overlay */}
+    <div className={`fixed inset-0 z-50 ${!open && "hidden"}`}>
       <div
         className="absolute inset-0 bg-black/50"
         onClick={() => onOpenChange(false)}
       />
-
-      {/* Drawer */}
       <div
         className={`absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-lg transform transition-transform duration-300 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="h-full flex flex-col">
-          {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h2 className="font-semibold text-lg">إضافة منتج جديد</h2>
             <button
@@ -256,8 +269,6 @@ function AddProductDrawer({ open, onOpenChange, categories, onSuccess }: AddProd
               ✕
             </button>
           </div>
-
-          {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
             <ProductClientForm categories={categories} onSuccess={onSuccess} />
           </div>
@@ -266,3 +277,4 @@ function AddProductDrawer({ open, onOpenChange, categories, onSuccess }: AddProd
     </div>
   );
 }
+ 

@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { getAdminProducts, getAdminCategories } from "@/lib/queries";
 import { ProductFilters } from "@/components/admin/ProductFilters";
 import { ProductsTable } from "@/components/admin/ProductsTable";
 import { getProductStatusFromProduct } from "@/lib/product-status";
@@ -16,11 +16,8 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
   const status = params.status || "";
 
   const [products, categories] = await Promise.all([
-    db.product.findMany({
-      include: { category: true },
-      orderBy: { createdAt: "desc" },
-    }),
-    db.category.findMany({ orderBy: { order: "asc" } }),
+    getAdminProducts(),
+    getAdminCategories(),
   ]);
 
   // Filter products based on search params

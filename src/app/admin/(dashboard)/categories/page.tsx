@@ -1,14 +1,11 @@
-import { db } from "@/lib/db";
+import { getAdminCategories } from "@/lib/queries";
 import { deleteCategoryAction } from "@/lib/actions";
 import { CategoryIcon } from "@/components/store/CategoryIcon";
 import { DeleteButton } from "@/components/admin/ActionForm";
 import { CategoryClientForm } from "@/components/admin/CategoryClientForm";
 
 export default async function AdminCategoriesPage() {
-  const categories = await db.category.findMany({
-    include: { _count: { select: { products: true } } },
-    orderBy: { order: "asc" },
-  });
+  const categories = await getAdminCategories();
 
   return (
     <div>

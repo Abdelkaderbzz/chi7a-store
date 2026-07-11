@@ -25,7 +25,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-gray-900 text-gray-300 min-h-screen flex flex-col shrink-0">
+    <aside className="fixed right-0 top-0 w-64 bg-gray-900 text-gray-300 h-screen flex flex-col shrink-0 z-40">
       <div className="p-5 border-b border-gray-800">
         <h2 className="text-white font-bold text-lg">Chi7a Admin</h2>
         <p className="text-xs text-gray-500 mt-1">لوحة الإدارة</p>

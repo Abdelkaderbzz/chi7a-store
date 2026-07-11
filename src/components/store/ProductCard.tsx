@@ -57,7 +57,7 @@ export function ProductCard({
           </span>
         )}
         {discountPercentage > 0 && (
-          <span className="absolute right-3 top-3 rounded-full bg-gold px-2.5 py-1 text-[11px] font-bold text-white shadow-md">
+          <span className="absolute right-3 top-3 rounded-full bg-gradient-to-br from-red-500 to-red-600 px-3 py-1.5 text-sm font-bold text-white shadow-lg ring-2 ring-white">
             -{discountPercentage}%
           </span>
         )}
@@ -74,7 +74,7 @@ export function ProductCard({
         </h3>
         <div className="mt-3">
           {priceBeforeDiscount && priceBeforeDiscount > price && (
-            <p className="text-xs text-gray-500 line-through">{formatPrice(priceBeforeDiscount)}</p>
+            <p className="text-sm text-gray-400 line-through">{formatPrice(priceBeforeDiscount)}</p>
           )}
           <p className="text-base font-bold text-ink">{formatPrice(price)}</p>
         </div>

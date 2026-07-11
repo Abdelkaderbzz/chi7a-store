@@ -1,9 +1,7 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { formatPrice, calculateDiscountPercentage } from "@/lib/utils";
 import { AddToCartButton } from "@/components/store/AddToCartButton";
 import { DirectOrderModal } from "@/components/store/DirectOrderModal";
 import { ProductCard } from "@/components/store/ProductCard";
@@ -11,14 +9,27 @@ import { CategoryIcon } from "@/components/store/CategoryIcon";
 import { ProductGallery } from "@/components/store/ProductGallery";
 import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 
+export async function generateStaticParams() {
+  try {
+    const products = await db.product.findMany({ select: { slug: true } });
+    return products.map((p) => ({ slug: p.slug }));
+  } catch (error) {
+    console.warn('Failed to generate static params for products, will use dynamic rendering:', error);
+    return [];
+  }
+}
+
+export const dynamicParams = true; // fallback to SSR for newly added products
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = await db.product.findUnique({ where: { slug } });
+  const product = await db.product.findUnique({ where: { slug }, select: { nameAr: true } });
   return { title: product?.nameAr || "منتج" };
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+
   const product = await db.product.findUnique({
     where: { slug },
     include: { category: true },
@@ -26,11 +37,26 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   if (!product) notFound();
 
-  const related = await db.product.findMany({
-    where: { categoryId: product.categoryId, id: { not: product.id } },
-    include: { category: true },
-    take: 4,
-  });
+  // Parse related product IDs from the JSON field
+  let relatedProductIds: string[] = [];
+  try {
+    relatedProductIds = JSON.parse(product.relatedProductIds);
+  } catch {
+    relatedProductIds = [];
+  }
+
+  // Fetch related products based on relatedProductIds, fallback to category if none set
+  const related = relatedProductIds.length > 0
+    ? await db.product.findMany({
+        where: { id: { in: relatedProductIds } },
+        include: { category: true },
+        take: 4,
+      })
+    : await db.product.findMany({
+        where: { categoryId: product.categoryId, id: { not: product.id } },
+        include: { category: true },
+        take: 4,
+      });
 
   return (
     <div className="container-page py-8">
@@ -61,7 +87,20 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             {product.category.nameAr}
           </Link>
           <h1 className="mt-2 text-2xl font-bold md:text-3xl">{product.nameAr}</h1>
-          <p className="mt-4 text-3xl font-bold text-ink">{formatPrice(product.price)}</p>
+          
+          <div className="mt-4 flex items-center gap-3">
+            {product.priceBeforeDiscount && product.priceBeforeDiscount > product.price && (
+              <>
+                <span className="inline-flex items-center gap-1 rounded-full bg-gold px-3 py-1.5 text-sm font-bold text-white shadow-md">
+                  -{calculateDiscountPercentage(product.price, product.priceBeforeDiscount)}%
+                </span>
+                <span className="text-lg text-gray-500 line-through">
+                  {formatPrice(product.priceBeforeDiscount)}
+                </span>
+              </>
+            )}
+          </div>
+          <p className="mt-2 text-3xl font-bold text-ink">{formatPrice(product.price)}</p>
 
           <div className="mt-4">
             {product.inStock ? (

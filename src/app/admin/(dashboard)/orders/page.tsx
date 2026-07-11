@@ -1,14 +1,8 @@
-import Link from "next/link";
-import Image from "next/image";
 import { db } from "@/lib/db";
-import { formatPrice } from "@/lib/utils";
-import { formatOrderDate, formatOrderDisplayId } from "@/lib/order-status";
 import { OrdersFilters } from "@/components/admin/OrdersFilters";
-import { OrderStatusBadge } from "@/components/admin/OrderStatusBadge";
-import { deleteOrderAction } from "@/lib/order-actions";
-import { Eye, Pencil, Truck, ClipboardList } from "lucide-react";
+import { OrdersTable } from "@/components/admin/OrdersTable";
+import { ClipboardList } from "lucide-react";
 import type { Prisma } from "@/generated/prisma/client";
-import { DeleteButton } from "@/components/admin/ActionForm";
 
 type SearchParams = Promise<{ q?: string; status?: string }>;
 
@@ -75,108 +69,7 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
 
       <OrdersFilters q={q ?? ""} status={status ?? ""} />
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        {orders.length === 0 ? (
-          <p className="text-center text-gray-500 py-16">لا توجد طلبات</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/80 text-gray-500">
-                  <th className="px-4 py-3 text-right font-medium">الرقم</th>
-                  <th className="px-4 py-3 text-right font-medium">المنتجات</th>
-                  <th className="px-4 py-3 text-right font-medium">العميل</th>
-                  <th className="px-4 py-3 text-right font-medium">التاريخ</th>
-                  <th className="px-4 py-3 text-right font-medium">التوصيل</th>
-                  <th className="px-4 py-3 text-right font-medium">الحالة</th>
-                  <th className="px-4 py-3 text-right font-medium">المجموع</th>
-                  <th className="px-4 py-3 text-center font-medium">إجراءات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gold-dark whitespace-nowrap">
-                      {formatOrderDisplayId(order.orderNumber)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {order.items.slice(0, 3).map((item) => (
-                          <div key={item.id} className="flex items-center gap-1">
-                            <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
-                              {item.image ? (
-                                <Image src={item.image} alt={item.productNameAr} fill className="object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">📦</div>
-                              )}
-                            </div>
-                            <span className="text-xs text-gray-500">×{item.quantity}</span>
-                          </div>
-                        ))}
-                        {order.items.length > 3 && (
-                          <span className="text-xs text-gray-400">+{order.items.length - 3}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{order.customerName}</span>
-                        {repeatPhones.has(order.phone) && (
-                          <span className="text-[10px] bg-gold/10 text-gold-dark px-2 py-0.5 rounded-full">
-                            عميل متكرر
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-400 mt-0.5" dir="ltr">{order.phone}</p>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
-                      {formatOrderDate(order.createdAt)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5 text-gray-600">
-                        <Truck size={14} className="text-gray-400" />
-                        <span>{order.city || "—"}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <OrderStatusBadge status={order.status} />
-                    </td>
-                    <td className="px-4 py-3 font-semibold whitespace-nowrap">
-                      {formatPrice(order.total)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-1">
-                        <Link
-                          href={`/admin/orders/${order.id}`}
-                          className="p-2 text-gray-400 hover:text-gold-dark hover:bg-gold/5 rounded-lg transition-colors"
-                          title="عرض"
-                        >
-                          <Eye size={16} />
-                        </Link>
-                        <Link
-                          href={`/admin/orders/${order.id}/edit`}
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="تعديل"
-                        >
-                          <Pencil size={16} />
-                        </Link>
-                        <DeleteButton action={deleteOrderAction.bind(null, order.id)} />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {orders.length > 0 && (
-          <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
-            <span>عرض {orders.length} طلب</span>
-            <span>الصفحة 1 من 1</span>
-          </div>
-        )}
-      </div>
+      <OrdersTable orders={orders} repeatPhones={repeatPhones} />
     </div>
   );
 }

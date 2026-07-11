@@ -129,16 +129,21 @@ export default function CheckoutPage() {
                   checked={deliveryMethod === "home"}
                   onChange={(e) => {
                     setDeliveryMethod("home");
-                    // Calculate delivery cost from products - this will be set later
-                    const avgDeliveryPrice = items.reduce((sum, item) => sum + (item.deliveryPrice || 5), 0) / items.length;
-                    setDeliveryCost(Math.round(avgDeliveryPrice * 100) / 100);
+                    // Calculate proper delivery cost: max deliveryPrice from all items in cart
+                    const maxDeliveryPrice = Math.max(...items.map(item => item.deliveryPrice || 7));
+                    setDeliveryCost(maxDeliveryPrice);
                   }}
                   className="w-4 h-4"
                 />
                 <Home size={20} className="text-gold" />
                 <div className="flex-1">
                   <p className="font-semibold">التوصيل لعنوانك</p>
-                  <p className="text-xs text-muted">+{formatPrice(deliveryMethod === "home" ? deliveryCost : 0)}</p>
+                  <p className="text-xs text-muted">
+                    {deliveryMethod === "home" 
+                      ? `+${formatPrice(deliveryCost)}`
+                      : `+${formatPrice(Math.max(...items.map(item => item.deliveryPrice || 7)))}`
+                    }
+                  </p>
                 </div>
               </label>
             </div>
