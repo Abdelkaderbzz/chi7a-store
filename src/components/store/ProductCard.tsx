@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, calculateDiscountPercentage } from "@/lib/utils";
 import { CategoryIcon } from "@/components/store/CategoryIcon";
 
 interface ProductCardProps {
@@ -9,6 +9,7 @@ interface ProductCardProps {
   nameAr: string;
   slug: string;
   price: number;
+  priceBeforeDiscount?: number | null;
   image: string | null;
   inStock: boolean;
   categoryName?: string;
@@ -19,11 +20,14 @@ export function ProductCard({
   nameAr,
   slug,
   price,
+  priceBeforeDiscount,
   image,
   inStock,
   categoryName,
   categorySlug,
 }: ProductCardProps) {
+  const discountPercentage = calculateDiscountPercentage(price, priceBeforeDiscount);
+
   return (
     <Link
       href={`/products/${slug}`}
@@ -52,6 +56,11 @@ export function ProductCard({
             نفذت الكمية
           </span>
         )}
+        {discountPercentage > 0 && (
+          <span className="absolute right-3 top-3 rounded-full bg-gold px-2.5 py-1 text-[11px] font-bold text-white shadow-md">
+            -{discountPercentage}%
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-4">
@@ -63,7 +72,12 @@ export function ProductCard({
         <h3 className="line-clamp-2 flex-1 text-sm font-semibold leading-snug transition-colors group-hover:text-gold-dark">
           {nameAr}
         </h3>
-        <p className="mt-3 text-base font-bold text-ink">{formatPrice(price)}</p>
+        <div className="mt-3">
+          {priceBeforeDiscount && priceBeforeDiscount > price && (
+            <p className="text-xs text-gray-500 line-through">{formatPrice(priceBeforeDiscount)}</p>
+          )}
+          <p className="text-base font-bold text-ink">{formatPrice(price)}</p>
+        </div>
       </div>
     </Link>
   );

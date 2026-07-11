@@ -14,6 +14,12 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
+export function calculateDiscountPercentage(price: number, priceBeforeDiscount: number | null | undefined): number {
+  if (!priceBeforeDiscount || priceBeforeDiscount <= 0) return 0;
+  const discount = ((priceBeforeDiscount - price) / priceBeforeDiscount) * 100;
+  return Math.round(discount);
+}
+
 export function slugify(text: string): string {
   if (!text) return Math.random().toString(36).substring(2, 9);
   const slug = text
