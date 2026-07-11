@@ -44,53 +44,67 @@ export default async function AdminDashboard() {
   tenDaysAgo.setDate(tenDaysAgo.getDate() - 9);
   tenDaysAgo.setHours(0, 0, 0, 0);
 
-  const [
-    allOrders,
-    todayOrders,
-    weekOrders,
-    monthOrders,
-    deliveredCount,
-    returnedCount,
-    totalOrderCount,
-    last10DaysOrders,
-    confirmedOrders,
-  ] = await Promise.all([
-    // Total revenue
-    db.order.aggregate({ _sum: { total: true }, _count: true }),
-    // Today
-    db.order.aggregate({
-      _sum: { total: true },
-      _count: true,
-      where: { createdAt: { gte: todayStart } },
-    }),
-    // This week
-    db.order.aggregate({
-      _sum: { total: true },
-      _count: true,
-      where: { createdAt: { gte: weekStart } },
-    }),
-    // This month
-    db.order.aggregate({
-      _sum: { total: true },
-      _count: true,
-      where: { createdAt: { gte: monthStart } },
-    }),
-    // Delivered
-    db.order.count({ where: { status: "delivered" } }),
-    // Returned
-    db.order.count({ where: { status: "returned" } }),
-    // Total orders for tracking
-    db.order.count(),
-    // Last 10 days orders for chart
-    db.order.findMany({
-      where: { createdAt: { gte: tenDaysAgo } },
-      select: { total: true, createdAt: true },
-    }),
-    // Confirmed orders (not cancelled/returned)
-    db.order.count({
-      where: { status: { notIn: ["cancelled", "returned"] } },
-    }),
-  ]);
+  let allOrders, todayOrders, weekOrders, monthOrders;
+  let deliveredCount = 0, returnedCount = 0, totalOrderCount = 0;
+  let last10DaysOrders: Array<{ total: number; createdAt: Date }> = [];
+  let confirmedOrders = 0;
+
+  try {
+    [
+      allOrders,
+      todayOrders,
+      weekOrders,
+      monthOrders,
+      deliveredCount,
+      returnedCount,
+      totalOrderCount,
+      last10DaysOrders,
+      confirmedOrders,
+    ] = await Promise.all([
+      // Total revenue
+      db.order.aggregate({ _sum: { total: true }, _count: true }),
+      // Today
+      db.order.aggregate({
+        _sum: { total: true },
+        _count: true,
+        where: { createdAt: { gte: todayStart } },
+      }),
+      // This week
+      db.order.aggregate({
+        _sum: { total: true },
+        _count: true,
+        where: { createdAt: { gte: weekStart } },
+      }),
+      // This month
+      db.order.aggregate({
+        _sum: { total: true },
+        _count: true,
+        where: { createdAt: { gte: monthStart } },
+      }),
+      // Delivered
+      db.order.count({ where: { status: "delivered" } }),
+      // Returned
+      db.order.count({ where: { status: "returned" } }),
+      // Total orders for tracking
+      db.order.count(),
+      // Last 10 days orders for chart
+      db.order.findMany({
+        where: { createdAt: { gte: tenDaysAgo } },
+        select: { total: true, createdAt: true },
+      }),
+      // Confirmed orders (not cancelled/returned)
+      db.order.count({
+        where: { status: { notIn: ["cancelled", "returned"] } },
+      }),
+    ]);
+  } catch (error) {
+    console.warn('Failed to fetch dashboard data, using fallback values:', error);
+    // Fallback to empty/zero values
+    allOrders = { _sum: { total: 0 }, _count: 0 };
+    todayOrders = { _sum: { total: 0 }, _count: 0 };
+    weekOrders = { _sum: { total: 0 }, _count: 0 };
+    monthOrders = { _sum: { total: 0 }, _count: 0 };
+  }
 
   // Abandoned order queries — separated to handle gracefully if model not yet available
   let abandonedTotal = 0;
