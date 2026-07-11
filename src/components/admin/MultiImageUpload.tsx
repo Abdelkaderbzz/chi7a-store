@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 interface MultiImageUploadProps {
   name?: string;
-  defaultImages?: string[];
+  defaultImages?: string[] | string;
   label?: string;
   maxImages?: number;
 }
@@ -19,7 +19,20 @@ export function MultiImageUpload({
   label = "صور المنتج (حد أقصى 5)",
   maxImages = 5,
 }: MultiImageUploadProps) {
-  const [urls, setUrls] = useState<string[]>(defaultImages);
+  // Parse defaultImages if it's a JSON string
+  const parseDefaultImages = () => {
+    if (!defaultImages) return [];
+    if (typeof defaultImages === 'string') {
+      try {
+        return JSON.parse(defaultImages);
+      } catch {
+        return [];
+      }
+    }
+    return defaultImages;
+  };
+
+  const [urls, setUrls] = useState<string[]>(parseDefaultImages);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -37,6 +50,11 @@ export function MultiImageUpload({
     const newUrls: string[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`الصورة "${file.name}" أكبر من 10 ميغابايت.`);
+        continue;
+      }
+
       const formData = new FormData();
       formData.append("file", file);
       const result = await uploadImageAction(formData);

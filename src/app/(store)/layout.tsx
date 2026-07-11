@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { Header, Footer } from "@/components/store/Header";
 import { CartProvider } from "@/components/store/CartProvider";
 
+export const dynamic = "force-dynamic";
+
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
   const categories = await db.category.findMany({
     orderBy: { order: "asc" },

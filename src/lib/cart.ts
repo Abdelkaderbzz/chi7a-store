@@ -5,6 +5,7 @@ export interface CartItem {
   price: number;
   image: string | null;
   quantity: number;
+  deliveryPrice?: number;
 }
 
 export const CART_STORAGE_KEY = "chi7a-cart";
