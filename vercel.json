@@ -1,5 +1,5 @@
 {
-  "buildCommand": "prisma generate && DATABASE_URL=file:./prisma/store.db prisma migrate deploy && DATABASE_URL=file:./prisma/store.db npx tsx prisma/seed.ts && npm run build",
+  "buildCommand": "prisma generate && next build",
   "framework": "nextjs",
-  "installCommand": "npm install"
+  "installCommand": "pnpm install"
 }
