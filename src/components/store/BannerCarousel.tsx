@@ -16,7 +16,7 @@ interface Banner {
   link: string | null;
 }
 
-const AUTOPLAY_MS = 6000;
+const AUTOPLAY_MS = 4000;
 
 export function BannerCarousel({ banners }: { banners: Banner[] }) {
   const [current, setCurrent] = useState(0);
@@ -28,7 +28,7 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
       if (index === current || isAnimating) return;
       setIsAnimating(true);
       setCurrent(index);
-      window.setTimeout(() => setIsAnimating(false), 700);
+      window.setTimeout(() => setIsAnimating(false), 1000);
     },
     [current, isAnimating]
   );
@@ -68,8 +68,8 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
                 fill
                 sizes="(max-width: 768px) 100vw, 1200px"
                 className={cn(
-                  "object-cover object-center transition-transform duration-[900ms] ease-out",
-                  isActive ? "scale-100" : "scale-105"
+                  "object-cover object-center transition-transform duration-[1200ms] ease-out",
+                  isActive ? "scale-100" : "scale-110"
                 )}
                 priority={index === 0}
               />
@@ -77,13 +77,13 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
                 <>
                   <div
                     className={cn(
-                      "absolute inset-0 bg-gradient-to-l from-black/75 via-black/25 to-transparent transition-opacity duration-700",
+                      "absolute inset-0 bg-gradient-to-l from-black/75 via-black/25 to-transparent transition-opacity duration-1000",
                       isActive ? "opacity-100" : "opacity-0"
                     )}
                   />
                   <div
                     className={cn(
-                      "absolute bottom-0 right-0 max-w-md p-6 text-right text-white transition-all duration-700 md:p-8",
+                      "absolute bottom-0 right-0 max-w-md p-6 text-right text-white transition-all duration-1000 md:p-8",
                       isActive ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
                     )}
                   >
@@ -104,7 +104,7 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
               key={banner.id}
               aria-hidden={!isActive}
               className={cn(
-                "banner-slide absolute inset-0 transition-all duration-700 ease-in-out",
+                "banner-slide absolute inset-0 transition-all duration-1000 ease-in-out",
                 isActive ? "z-10 opacity-100" : "z-0 pointer-events-none opacity-0"
               )}
             >

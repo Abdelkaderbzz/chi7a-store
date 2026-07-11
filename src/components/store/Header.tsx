@@ -14,7 +14,6 @@ interface Category {
 
 const navLinks = [
   { href: "/products", label: "المنتجات" },
-  { href: "/cart", label: "السلة" },
   { href: "/contact", label: "اتصل بنا" },
 ];
 
