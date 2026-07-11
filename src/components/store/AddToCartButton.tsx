@@ -11,10 +11,11 @@ interface AddToCartButtonProps {
   nameAr: string;
   price: number;
   image: string | null;
+  deliveryPrice?: number;
   inStock: boolean;
 }
 
-export function AddToCartButton({ id, slug, nameAr, price, image, inStock }: AddToCartButtonProps) {
+export function AddToCartButton({ id, slug, nameAr, price, image, deliveryPrice, inStock }: AddToCartButtonProps) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -28,7 +29,7 @@ export function AddToCartButton({ id, slug, nameAr, price, image, inStock }: Add
   }
 
   function handleAdd() {
-    addItem({ id, slug, nameAr, price, image }, quantity);
+    addItem({ id, slug, nameAr, price, image, deliveryPrice }, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }

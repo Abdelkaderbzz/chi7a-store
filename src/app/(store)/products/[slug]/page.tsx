@@ -3,13 +3,13 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
-import { STORE_INFO } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/components/store/AddToCartButton";
+import { DirectOrderModal } from "@/components/store/DirectOrderModal";
 import { ProductCard } from "@/components/store/ProductCard";
 import { CategoryIcon } from "@/components/store/CategoryIcon";
 import { ProductGallery } from "@/components/store/ProductGallery";
-import { ArrowRight, Phone, MessageCircle, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -31,10 +31,6 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     include: { category: true },
     take: 4,
   });
-
-  const whatsappMsg = encodeURIComponent(
-    `مرحبا، أريد الاستفسار عن: ${product.nameAr} - ${formatPrice(product.price)}`
-  );
 
   return (
     <div className="container-page py-8">
@@ -97,26 +93,20 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               nameAr={product.nameAr}
               price={product.price}
               image={product.image}
+              deliveryPrice={product.deliveryPrice || undefined}
               inStock={product.inStock}
             />
             <div className="flex flex-col gap-3 sm:flex-row">
-              <a
-                href={`${STORE_INFO.whatsapp}?text=${whatsappMsg}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1"
-              >
-                <Button variant="whatsapp" size="lg" className="w-full">
-                  <MessageCircle size={18} />
-                  اطلب عبر واتساب
-                </Button>
-              </a>
-              <a href={`tel:${STORE_INFO.phone}`} className="flex-1">
-                <Button variant="outline" size="lg" className="w-full">
-                  <Phone size={18} />
-                  اتصل بنا
-                </Button>
-              </a>
+              <div className="flex-1">
+                <DirectOrderModal 
+                  product={{
+                    id: product.id,
+                    nameAr: product.nameAr,
+                    price: product.price,
+                    image: product.image
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
