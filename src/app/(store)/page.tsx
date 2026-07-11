@@ -23,6 +23,9 @@ export default async function HomePage() {
       include: { category: true },
       take: 12,
       orderBy: { createdAt: "desc" },
+    }).catch((error) => {
+      console.warn('Failed to fetch featured products, returning empty array:', error);
+      return [];
     }),
   ]);
 

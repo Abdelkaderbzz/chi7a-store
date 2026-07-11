@@ -6,10 +6,15 @@ import { db } from "@/lib/db";
 /** Lightweight list used in the store header and products filter bar. */
 export const getCategories = unstable_cache(
   async () => {
-    return db.category.findMany({
-      orderBy: { order: "asc" },
-      select: { id: true, slug: true, nameAr: true, name: true },
-    });
+    try {
+      return await db.category.findMany({
+        orderBy: { order: "asc" },
+        select: { id: true, slug: true, nameAr: true, name: true },
+      });
+    } catch (error) {
+      console.warn('Failed to fetch categories, returning empty array:', error);
+      return [];
+    }
   },
   ["categories"],
   { revalidate: 300, tags: ["categories"] }
@@ -18,10 +23,15 @@ export const getCategories = unstable_cache(
 /** Full list with product counts — used on the home page grid. */
 export const getCategoriesWithCount = unstable_cache(
   async () => {
-    return db.category.findMany({
-      orderBy: { order: "asc" },
-      include: { _count: { select: { products: true } } },
-    });
+    try {
+      return await db.category.findMany({
+        orderBy: { order: "asc" },
+        include: { _count: { select: { products: true } } },
+      });
+    } catch (error) {
+      console.warn('Failed to fetch categories with count, returning empty array:', error);
+      return [];
+    }
   },
   ["categories-with-count"],
   { revalidate: 300, tags: ["categories"] }
@@ -30,7 +40,12 @@ export const getCategoriesWithCount = unstable_cache(
 /** Active banners for the store front. */
 export const getBanners = unstable_cache(
   async () => {
-    return db.banner.findMany({ where: { active: true }, orderBy: { order: "asc" } });
+    try {
+      return await db.banner.findMany({ where: { active: true }, orderBy: { order: "asc" } });
+    } catch (error) {
+      console.warn('Failed to fetch banners, returning empty array:', error);
+      return [];
+    }
   },
   ["banners"],
   { revalidate: 300, tags: ["banners"] }
@@ -45,10 +60,15 @@ export const getBanners = unstable_cache(
  */
 export const getAdminCategories = unstable_cache(
   async () => {
-    return db.category.findMany({
-      orderBy: { order: "asc" },
-      include: { _count: { select: { products: true } } },
-    });
+    try {
+      return await db.category.findMany({
+        orderBy: { order: "asc" },
+        include: { _count: { select: { products: true } } },
+      });
+    } catch (error) {
+      console.warn('Failed to fetch admin categories, returning empty array:', error);
+      return [];
+    }
   },
   ["admin-categories"],
   { revalidate: 30, tags: ["categories"] }
@@ -60,10 +80,15 @@ export const getAdminCategories = unstable_cache(
  */
 export const getAdminProducts = unstable_cache(
   async () => {
-    return db.product.findMany({
-      include: { category: true },
-      orderBy: { createdAt: "desc" },
-    });
+    try {
+      return await db.product.findMany({
+        include: { category: true },
+        orderBy: { createdAt: "desc" },
+      });
+    } catch (error) {
+      console.warn('Failed to fetch admin products, returning empty array:', error);
+      return [];
+    }
   },
   ["admin-products"],
   { revalidate: 30, tags: ["products"] }
@@ -75,7 +100,12 @@ export const getAdminProducts = unstable_cache(
  */
 export const getAdminBanners = unstable_cache(
   async () => {
-    return db.banner.findMany({ orderBy: { order: "asc" } });
+    try {
+      return await db.banner.findMany({ orderBy: { order: "asc" } });
+    } catch (error) {
+      console.warn('Failed to fetch admin banners, returning empty array:', error);
+      return [];
+    }
   },
   ["admin-banners"],
   { revalidate: 30, tags: ["banners"] }
