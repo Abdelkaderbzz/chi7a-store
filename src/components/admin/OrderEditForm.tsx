@@ -10,7 +10,8 @@ import { FormSelect } from "@/components/ui/form-select";
 import { ORDER_STATUSES } from "@/lib/order-status";
 import { updateOrderAction } from "@/lib/order-actions";
 import { OrderStatusBadge } from "@/components/admin/OrderStatusBadge";
-import { useForm } from "react-hook-form";
+import { tunisianStates } from "@/lib/constants";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OrderEditSchema, type OrderEditValues } from "@/lib/validations";
 
@@ -33,6 +34,7 @@ export function OrderEditForm({ order }: OrderEditFormProps) {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<OrderEditValues>({
@@ -79,9 +81,17 @@ export function OrderEditForm({ order }: OrderEditFormProps) {
         <div className="p-5 space-y-5">
           <div>
             <label className="block text-sm font-medium mb-2">الحالة</label>
-            <FormSelect
-              {...register("status")}
-              options={ORDER_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <FormSelect
+                  name={field.name}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  options={ORDER_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+                />
+              )}
             />
             {errors.status && <p className="text-xs text-red-500 mt-1">{errors.status.message}</p>}
             <div className="flex flex-wrap gap-2 mt-3">
@@ -94,7 +104,22 @@ export function OrderEditForm({ order }: OrderEditFormProps) {
           <div className="grid md:grid-cols-2 gap-4">
             <Input {...register("customerName")} label="الاسم" error={errors.customerName?.message} />
             <Input {...register("phone")} label="الهاتف" dir="ltr" className="text-left" error={errors.phone?.message} />
-            <Input {...register("city")} label="المدينة" error={errors.city?.message} />
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium">المدينة</label>
+              <Controller
+                name="city"
+                control={control}
+                render={({ field }) => (
+                  <FormSelect
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    options={tunisianStates.map((c) => ({ value: c.arabic, label: c.arabic }))}
+                  />
+                )}
+              />
+              {errors.city?.message && <p className="text-xs text-red-500">{errors.city.message}</p>}
+            </div>
             <Input {...register("address")} label="العنوان" error={errors.address?.message} />
           </div>
 

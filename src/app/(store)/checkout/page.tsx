@@ -12,15 +12,11 @@ import { FormSelect } from "@/components/ui/form-select";
 import { formatPrice } from "@/lib/utils";
 import { getCartTotal } from "@/lib/cart";
 import { placeOrderAction } from "@/lib/order-actions";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckoutSchema, type CheckoutValues } from "@/lib/validations";
 
-const TUNISIAN_CITIES = [
-  "دوز", "قبلي", "تونس", "صفاقس", "سوسة", "المنستير", "المهدية",
-  "بنزرت", "أريانة", "بن عروس", "نابل", "القيروان", "قابس",
-  "مدنين", "تطاوين", "الكاف", "جندوبة", "باجة", "سليانة", "زغوان",
-];
+import { tunisianStates } from "@/lib/constants";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -31,6 +27,7 @@ export default function CheckoutPage() {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<CheckoutValues>({
@@ -104,10 +101,18 @@ export default function CheckoutPage() {
             />
             <div className="space-y-1.5">
               <label className="block text-sm font-medium">المدينة</label>
-              <FormSelect
-                {...register("city")}
-                placeholder="اختر المدينة"
-                options={TUNISIAN_CITIES.map((c) => ({ value: c, label: c }))}
+              <Controller
+                name="city"
+                control={control}
+                render={({ field }) => (
+                  <FormSelect
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="اختر المدينة"
+                    options={tunisianStates.map((c) => ({ value: c.arabic, label: c.arabic }))}
+                  />
+                )}
               />
               {errors.city?.message && <p className="text-xs text-red-500">{errors.city.message}</p>}
             </div>

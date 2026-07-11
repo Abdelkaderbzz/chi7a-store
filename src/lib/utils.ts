@@ -15,12 +15,15 @@ export function formatPrice(price: number): string {
 }
 
 export function slugify(text: string): string {
-  return text
+  if (!text) return Math.random().toString(36).substring(2, 9);
+  const slug = text
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, "")
+    .replace(/[^\w\s-\u0600-\u06FF]/g, "") // Allow Arabic characters
     .replace(/[\s_]+/g, "-")
     .replace(/-+/g, "-");
+  
+  return slug || Math.random().toString(36).substring(2, 9);
 }
 
 export function parseImages(images: string): string[] {
