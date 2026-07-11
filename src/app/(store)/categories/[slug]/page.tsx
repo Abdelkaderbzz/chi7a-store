@@ -5,8 +5,13 @@ import { CategoryIcon } from "@/components/store/CategoryIcon";
 import Link from "next/link";
 
 export async function generateStaticParams() {
-  const categories = await db.category.findMany({ select: { slug: true } });
-  return categories.map((c) => ({ slug: c.slug }));
+  try {
+    const categories = await db.category.findMany({ select: { slug: true } });
+    return categories.map((c) => ({ slug: c.slug }));
+  } catch (error) {
+    console.warn('Failed to generate static params for categories, will use dynamic rendering:', error);
+    return [];
+  }
 }
 
 export const dynamicParams = true;

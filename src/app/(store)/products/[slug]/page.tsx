@@ -10,8 +10,13 @@ import { ProductGallery } from "@/components/store/ProductGallery";
 import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 
 export async function generateStaticParams() {
-  const products = await db.product.findMany({ select: { slug: true } });
-  return products.map((p) => ({ slug: p.slug }));
+  try {
+    const products = await db.product.findMany({ select: { slug: true } });
+    return products.map((p) => ({ slug: p.slug }));
+  } catch (error) {
+    console.warn('Failed to generate static params for products, will use dynamic rendering:', error);
+    return [];
+  }
 }
 
 export const dynamicParams = true; // fallback to SSR for newly added products
