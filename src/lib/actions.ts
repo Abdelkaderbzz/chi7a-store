@@ -104,6 +104,14 @@ export async function createProductAction(prevState: any, formData: FormData) {
     const description = (formData.get("description") as string) || null;
     const descriptionAr = (formData.get("descriptionAr") as string) || null;
     const price = parseFloat(formData.get("price") as string);
+    const sku = (formData.get("sku") as string) || null;
+    const priceBeforeDiscount = formData.get("priceBeforeDiscount") ? parseFloat(formData.get("priceBeforeDiscount") as string) : null;
+    const cost = formData.get("cost") ? parseFloat(formData.get("cost") as string) : null;
+    const deliveryPrice = formData.get("deliveryPrice") ? parseFloat(formData.get("deliveryPrice") as string) : null;
+    const deliveryCost = formData.get("deliveryCost") ? parseFloat(formData.get("deliveryCost") as string) : null;
+    const stock = parseInt(formData.get("stock") as string) || 0;
+    const relatedProductIds = (formData.get("relatedProductIds") as string) || "[]";
+    
     const imagesStr = (formData.get("images") as string) || "[]";
     let imagesArr: string[] = [];
     try {
@@ -124,12 +132,19 @@ export async function createProductAction(prevState: any, formData: FormData) {
         slug: slugify(name),
         description,
         descriptionAr,
+        sku,
         price,
+        priceBeforeDiscount,
+        cost,
+        deliveryPrice,
+        deliveryCost,
+        stock,
         image,
         images: JSON.stringify(imagesArr),
         categoryId,
         featured,
         inStock,
+        relatedProductIds,
       },
     });
     revalidatePath("/");
@@ -151,6 +166,14 @@ export async function updateProductAction(id: string, prevState: any, formData: 
     const description = (formData.get("description") as string) || null;
     const descriptionAr = (formData.get("descriptionAr") as string) || null;
     const price = parseFloat(formData.get("price") as string);
+    const sku = (formData.get("sku") as string) || null;
+    const priceBeforeDiscount = formData.get("priceBeforeDiscount") ? parseFloat(formData.get("priceBeforeDiscount") as string) : null;
+    const cost = formData.get("cost") ? parseFloat(formData.get("cost") as string) : null;
+    const deliveryPrice = formData.get("deliveryPrice") ? parseFloat(formData.get("deliveryPrice") as string) : null;
+    const deliveryCost = formData.get("deliveryCost") ? parseFloat(formData.get("deliveryCost") as string) : null;
+    const stock = parseInt(formData.get("stock") as string) || 0;
+    const relatedProductIds = (formData.get("relatedProductIds") as string) || "[]";
+    
     const imagesStr = (formData.get("images") as string) || "[]";
     let imagesArr: string[] = [];
     try {
@@ -166,7 +189,25 @@ export async function updateProductAction(id: string, prevState: any, formData: 
 
     await db.product.update({
       where: { id },
-      data: { name, nameAr, description, descriptionAr, price, image, images: JSON.stringify(imagesArr), categoryId, featured, inStock },
+      data: { 
+        name, 
+        nameAr, 
+        description, 
+        descriptionAr, 
+        sku,
+        price,
+        priceBeforeDiscount,
+        cost,
+        deliveryPrice,
+        deliveryCost,
+        stock,
+        image, 
+        images: JSON.stringify(imagesArr), 
+        categoryId, 
+        featured, 
+        inStock,
+        relatedProductIds,
+      },
     });
     revalidatePath("/");
     revalidatePath("/products");

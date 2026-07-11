@@ -8,8 +8,8 @@ export const phoneRegex = /^\d{8}$/;
 export const CheckoutSchema = z.object({
   name: requiredString("الاسم الكامل مطلوب"),
   phone: z.string().regex(phoneRegex, { message: "رقم الهاتف يجب أن يتكون من 8 أرقام فقط" }),
-  city: requiredString("المدينة مطلوبة"),
-  address: requiredString("العنوان مطلوب"),
+  city: z.string().optional(),
+  address: z.string().optional(),
 });
 
 export type CheckoutValues = z.infer<typeof CheckoutSchema>;
@@ -26,10 +26,17 @@ export const ProductSchema = z.object({
   nameAr: requiredString("الاسم العربي مطلوب"),
   categoryId: requiredString("التصنيف مطلوب"),
   price: z.coerce.number({ message: "السعر غير صالح" }).positive({ message: "يجب أن يكون السعر أكبر من صفر" }),
+  priceBeforeDiscount: z.coerce.number().positive().optional().nullable(),
+  cost: z.coerce.number().positive().optional().nullable(),
+  deliveryPrice: z.coerce.number().positive().optional().nullable(),
+  deliveryCost: z.coerce.number().positive().optional().nullable(),
+  stock: z.coerce.number({ message: "المخزون غير صالح" }).nonnegative().default(0),
+  sku: z.string().optional().nullable(),
   descriptionAr: z.string().optional(),
   description: z.string().optional(),
   featured: z.boolean().default(false).optional(),
   inStock: z.boolean().default(true).optional(),
+  relatedProductIds: z.string().optional().default("[]"),
 });
 
 export type ProductValues = z.infer<typeof ProductSchema>;
