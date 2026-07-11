@@ -7,11 +7,10 @@ import { formatPrice } from "@/lib/utils";
 import { formatOrderDate, formatOrderDisplayId } from "@/lib/order-status";
 import { OrderStatusBadge } from "@/components/admin/OrderStatusBadge";
 import { deleteOrderAction } from "@/lib/order-actions";
-import { Eye, Pencil, Truck, ChevronRight, ChevronLeft } from "lucide-react";
+import { Eye, Pencil, Truck } from "lucide-react";
 import { DeleteButton } from "@/components/admin/ActionForm";
+import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
-
-const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 interface OrderItem {
   id: string;
@@ -163,60 +162,15 @@ export function OrdersTable({ orders: initialOrders, repeatPhones }: OrdersTable
             </table>
           </div>
 
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 text-sm text-gray-500">
-              <div className="flex items-center gap-4">
-                <span>
-                  {(safePage - 1) * pageSize + 1}–{Math.min(safePage * pageSize, orders.length)} من {orders.length} طلب
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs">عرض:</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                    className="border border-gray-300 rounded px-2 py-1 text-xs"
-                  >
-                    {PAGE_SIZE_OPTIONS.map((size) => (
-                      <option key={size} value={size}>
-                        {size}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={safePage === 1}
-                  className="p-1.5 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  aria-label="الصفحة السابقة"
-                >
-                  <ChevronRight size={16} />
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setPage(p)}
-                    className={`min-w-[32px] h-8 rounded text-xs font-medium transition-colors ${
-                      p === safePage
-                        ? "bg-gold text-white"
-                        : "hover:bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={safePage === totalPages}
-                  className="p-1.5 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  aria-label="الصفحة التالية"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={orders.length}
+            itemsLabel="طلب"
+            onPageChange={setPage}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </>
       )}
     </div>
