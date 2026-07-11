@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html, body {
+  overscroll-behavior-y: none;
+}
+
 :root {
   /* Brand — warm gold + charcoal, refined */
   --gold: #c9a227;
