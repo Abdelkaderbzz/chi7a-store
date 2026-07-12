@@ -79,6 +79,7 @@ export async function placeOrderAction(input: CheckoutInput) {
     include: { items: true },
   });
 
+  revalidatePath("/admin");
   revalidatePath("/admin/orders");
 
   return { success: true, orderNumber: order.orderNumber, orderId: order.id };
@@ -90,6 +91,7 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
     if (!VALID_STATUSES.has(status as never)) return { error: "حالة غير صالحة" };
 
     await db.order.update({ where: { id: orderId }, data: { status } });
+    revalidatePath("/admin");
     revalidatePath("/admin/orders");
     revalidatePath(`/admin/orders/${orderId}`);
     revalidatePath(`/admin/orders/${orderId}/edit`);
@@ -119,6 +121,7 @@ export async function updateOrderAction(formData: FormData) {
       data: { customerName, phone, city, address, status, note },
     });
 
+    revalidatePath("/admin");
     revalidatePath("/admin/orders");
     revalidatePath(`/admin/orders/${orderId}`);
     return { success: true, message: "تم تحديث الطلب بنجاح" };
@@ -131,6 +134,7 @@ export async function deleteOrderAction(orderId: string, prevState?: any, formDa
   try {
     await requireAdmin();
     await db.order.delete({ where: { id: orderId } });
+    revalidatePath("/admin");
     revalidatePath("/admin/orders");
     return { success: true, message: "تم حذف الطلب بنجاح" };
   } catch (error) {

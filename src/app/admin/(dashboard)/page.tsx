@@ -10,6 +10,10 @@ import {
   Info,
 } from "lucide-react";
 
+// Force dynamic rendering for real-time dashboard data
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function getStartOfDay(d: Date) {
   const start = new Date(d);
   start.setHours(0, 0, 0, 0);
