@@ -93,6 +93,7 @@ export function ProductsTable({ products: initialProducts, categories }: Product
           open={showAddDrawer}
           onOpenChange={setShowAddDrawer}
           categories={categories}
+          products={products}
           onSuccess={handleAddSuccess}
         />
       )}
@@ -244,10 +245,11 @@ interface AddProductDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   categories: Category[];
+  products: Product[];
   onSuccess: () => void;
 }
 
-function AddProductDrawer({ open, onOpenChange, categories, onSuccess }: AddProductDrawerProps) {
+function AddProductDrawer({ open, onOpenChange, categories, products, onSuccess }: AddProductDrawerProps) {
   return (
     <div className={`fixed inset-0 z-50 ${!open && "hidden"}`}>
       <div
@@ -270,7 +272,7 @@ function AddProductDrawer({ open, onOpenChange, categories, onSuccess }: AddProd
             </button>
           </div>
           <div className="flex-1 overflow-y-auto p-6">
-            <ProductClientForm categories={categories} onSuccess={onSuccess} />
+            <ProductClientForm categories={categories} allProducts={products} onSuccess={onSuccess} />
           </div>
         </div>
       </div>

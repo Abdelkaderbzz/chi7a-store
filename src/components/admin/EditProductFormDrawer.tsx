@@ -1,12 +1,13 @@
 "use client";
 
-import { useTransition, useRef } from "react";
+import { useTransition, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProductSchema, type ProductValues } from "@/lib/validations";
 import { updateProductAction } from "@/lib/actions";
 import { MultiImageUpload } from "@/components/admin/MultiImageUpload";
 import { FormSelect } from "@/components/ui/form-select";
+import { RelatedProductsSelector } from "@/components/admin/RelatedProductsSelector";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 
@@ -55,12 +56,14 @@ export function EditProductFormDrawer({
   const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
-  let relatedIds: string[] = [];
+  let initialRelatedIds: string[] = [];
   try {
-    relatedIds = JSON.parse(product.relatedProductIds);
+    initialRelatedIds = JSON.parse(product.relatedProductIds);
   } catch {
-    relatedIds = [];
+    initialRelatedIds = [];
   }
+
+  const [relatedProductIds, setRelatedProductIds] = useState<string[]>(initialRelatedIds);
 
   const {
     register,
@@ -85,7 +88,6 @@ export function EditProductFormDrawer({
       descriptionAr: product.descriptionAr ?? undefined,
       featured: product.featured,
       inStock: product.inStock,
-      relatedProductIds: JSON.stringify(relatedIds),
     },
   });
 
@@ -113,7 +115,8 @@ export function EditProductFormDrawer({
       if (data.featured) formData.append("featured", "on");
       if (data.inStock) formData.append("inStock", "on");
 
-      formData.append("relatedProductIds", data.relatedProductIds || "[]");
+      // Use the state value for related products
+      formData.append("relatedProductIds", JSON.stringify(relatedProductIds));
 
       const result = await updateProductAction(product.id, null, formData);
 
@@ -303,47 +306,13 @@ export function EditProductFormDrawer({
             {/* Related Products */}
             <div className="space-y-4 pb-6">
               <h3 className="font-semibold text-sm">المنتجات ذات الصلة</h3>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">اختر المنتجات ذات الصلة</label>
-                <div className="space-y-2 overflow-y-auto border border-gray-200 rounded-lg p-3" style={{ maxHeight: "200px" }}>
-                  {allProducts
-                    .filter((p) => p.id !== product.id)
-                    .map((p) => (
-                      <label key={p.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-                        <input
-                          type="checkbox"
-                          value={p.id}
-                          defaultChecked={relatedIds.includes(p.id)}
-                          onChange={(e) => {
-                            const isChecked = e.target.checked;
-                            const currentInput = formRef.current?.querySelector('input[name="relatedProductIds"]') as HTMLInputElement | null;
-                            if (currentInput) {
-                              try {
-                                const ids = JSON.parse(currentInput.value);
-                                if (isChecked) {
-                                  ids.push(p.id);
-                                } else {
-                                  ids.splice(ids.indexOf(p.id), 1);
-                                }
-                                currentInput.value = JSON.stringify(ids);
-                              } catch {
-                                currentInput.value = isChecked ? JSON.stringify([p.id]) : "[]";
-                              }
-                            }
-                          }}
-                          className="rounded"
-                        />
-                        <span className="text-sm">{p.nameAr}</span>
-                      </label>
-                    ))}
-                </div>
-                <input
-                  type="hidden"
-                  {...register("relatedProductIds")}
-                  defaultValue={JSON.stringify(relatedIds)}
-                />
-              </div>
+              <RelatedProductsSelector
+                products={allProducts}
+                categories={categories}
+                currentProductId={product.id}
+                selectedIds={relatedProductIds}
+                onChange={setRelatedProductIds}
+              />
             </div>
 
             <button

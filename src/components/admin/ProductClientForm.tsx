@@ -1,12 +1,13 @@
 "use client";
 
-import { useTransition, useRef } from "react";
+import { useTransition, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProductSchema, type ProductValues } from "@/lib/validations";
 import { createProductAction } from "@/lib/actions";
 import { MultiImageUpload } from "@/components/admin/MultiImageUpload";
 import { FormSelect } from "@/components/ui/form-select";
+import { RelatedProductsSelector } from "@/components/admin/RelatedProductsSelector";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 
@@ -15,14 +16,24 @@ interface Category {
   nameAr: string;
 }
 
+interface Product {
+  id: string;
+  name: string;
+  nameAr: string;
+  image: string | null;
+  categoryId: string;
+}
+
 interface ProductClientFormProps {
   categories: Category[];
+  allProducts?: Product[];
   onSuccess?: () => void;
 }
 
-export function ProductClientForm({ categories, onSuccess }: ProductClientFormProps) {
+export function ProductClientForm({ categories, allProducts = [], onSuccess }: ProductClientFormProps) {
   const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const [relatedProductIds, setRelatedProductIds] = useState<string[]>([]);
 
   const {
     register,
@@ -64,7 +75,7 @@ export function ProductClientForm({ categories, onSuccess }: ProductClientFormPr
 
       if (data.featured) formData.append("featured", "on");
       if (data.inStock) formData.append("inStock", "on");
-      formData.append("relatedProductIds", data.relatedProductIds || "[]");
+      formData.append("relatedProductIds", JSON.stringify(relatedProductIds));
 
       const result = await createProductAction(null, formData);
       
@@ -73,6 +84,7 @@ export function ProductClientForm({ categories, onSuccess }: ProductClientFormPr
       } else if (result?.success) {
         toast.success(result.message);
         reset();
+        setRelatedProductIds([]);
         const imagesInput = formRef.current?.querySelector('input[name="images"]') as HTMLInputElement | null;
         if (imagesInput) imagesInput.value = "[]";
         if (onSuccess) {
@@ -227,6 +239,20 @@ export function ProductClientForm({ categories, onSuccess }: ProductClientFormPr
         </div>
         
         <MultiImageUpload maxImages={5} />
+
+        {/* Related Products - only show if we have products */}
+        {allProducts.length > 0 && (
+          <div className="space-y-4 pb-4 border-b">
+            <h3 className="font-semibold text-sm">المنتجات ذات الصلة</h3>
+            <RelatedProductsSelector
+              products={allProducts}
+              categories={categories}
+              currentProductId=""
+              selectedIds={relatedProductIds}
+              onChange={setRelatedProductIds}
+            />
+          </div>
+        )}
 
         <button 
           type="submit" 

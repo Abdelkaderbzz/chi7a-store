@@ -187,7 +187,7 @@ export async function updateProductAction(id: string, prevState: any, formData: 
     const featured = formData.get("featured") === "on";
     const inStock = formData.get("inStock") !== "off";
 
-    await db.product.update({
+    const updatedProduct = await db.product.update({
       where: { id },
       data: { 
         name, 
@@ -209,9 +209,13 @@ export async function updateProductAction(id: string, prevState: any, formData: 
         relatedProductIds,
       },
     });
+    
+    // Revalidate all relevant paths
     revalidatePath("/");
     revalidatePath("/products");
+    revalidatePath(`/products/${updatedProduct.slug}`);
     revalidatePath("/admin/products");
+    
     return { success: true, message: "تم تحديث المنتج بنجاح" };
   } catch (error: any) {
     return { error: "حدث خطأ أثناء تحديث المنتج" };
