@@ -63,6 +63,7 @@ export function OrderEditForm({ order }: OrderEditFormProps) {
       const result = await updateOrderAction(formData);
       if (result?.success) {
         toast.success(result.message);
+        router.refresh(); // Force refresh server data
         router.push(`/admin/orders/${order.id}`);
       } else if (result?.error) {
         toast.error(result.error);

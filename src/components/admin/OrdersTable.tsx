@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
@@ -37,6 +38,7 @@ interface OrdersTableProps {
 }
 
 export function OrdersTable({ orders: initialOrders, repeatPhones }: OrdersTableProps) {
+  const router = useRouter();
   const [orders, setOrders] = useState(initialOrders);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -55,6 +57,8 @@ export function OrdersTable({ orders: initialOrders, repeatPhones }: OrdersTable
         const newTotal = Math.max(1, Math.ceil(next.length / pageSize));
         if (safePage > newTotal) setPage(newTotal);
         toast.success(result.message);
+        // Refresh server data to update dashboard
+        router.refresh();
       } else {
         toast.error(result?.error || "حدث خطأ");
       }
